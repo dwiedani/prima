@@ -39,7 +39,10 @@ var Script;
     let viewport;
     document.addEventListener("interactiveViewportStarted", start);
     let laser_1Transform;
+    let laser_1RotationSpeed = 270;
     let agentTransform;
+    let agentMovementSpeed = 7;
+    let agentTurnSpeed = 270;
     //let camera: f.ComponentCamera;
     function start(_event) {
         viewport = _event.detail;
@@ -49,24 +52,25 @@ var Script;
         //camera = graph.getChildrenByName("Camera")[0].getComponent(f.ComponentCamera);
         laser_1Transform = lasers[0].getChildrenByName("Laser_1")[0].getComponent(f.ComponentTransform).mtxLocal;
         agentTransform = agents[0].getChildrenByName("Agent_1")[0].getComponent(f.ComponentTransform).mtxLocal;
+        viewport.camera.mtxPivot.translateZ(-15);
         //viewport.camera = camera;
         f.Loop.addEventListener("loopFrame" /* LOOP_FRAME */, update);
-        f.Loop.start(); // start the game loop to continously draw the viewport, update the audiosystem and drive the physics i/a
+        f.Loop.start(f.LOOP_MODE.TIME_REAL, 60); // start the game loop to continously draw the viewport, update the audiosystem and drive the physics i/a
     }
     function update(_event) {
         // f.Physics.world.simulate();  // if physics is included and use
-        laser_1Transform.rotateZ(1);
+        laser_1Transform.rotateZ(laser_1RotationSpeed * f.Loop.timeFrameReal / 1000);
         if (f.Keyboard.isPressedOne([f.KEYBOARD_CODE.ARROW_UP])) {
-            agentTransform.translateY(0.1);
+            agentTransform.translateY(agentMovementSpeed * f.Loop.timeFrameReal / 1000);
         }
         if (f.Keyboard.isPressedOne([f.KEYBOARD_CODE.ARROW_DOWN])) {
-            agentTransform.translateY(-0.1);
+            agentTransform.translateY(-agentMovementSpeed * f.Loop.timeFrameReal / 1000);
         }
         if (f.Keyboard.isPressedOne([f.KEYBOARD_CODE.ARROW_LEFT])) {
-            agentTransform.rotateZ(5);
+            agentTransform.rotateZ(agentTurnSpeed * f.Loop.timeFrameReal / 1000);
         }
         if (f.Keyboard.isPressedOne([f.KEYBOARD_CODE.ARROW_RIGHT])) {
-            agentTransform.rotateZ(-5);
+            agentTransform.rotateZ(-agentTurnSpeed * f.Loop.timeFrameReal / 1000);
         }
         viewport.draw();
         f.AudioManager.default.update();
