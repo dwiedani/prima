@@ -41,7 +41,10 @@ var Script;
     let laser_1Transform;
     let laser_1RotationSpeed = 270;
     let agentTransform;
-    let agentMovementSpeed = 7;
+    let agentMovementSpeed = 0;
+    let agentMaxMovementSpeed = 7.0;
+    let agentAccelerationSpeed = 0.1;
+    let agentFrictionSpeed = 0.1;
     let agentTurnSpeed = 270;
     //let camera: f.ComponentCamera;
     function start(_event) {
@@ -56,15 +59,29 @@ var Script;
         //viewport.camera = camera;
         f.Loop.addEventListener("loopFrame" /* LOOP_FRAME */, update);
         f.Loop.start(f.LOOP_MODE.TIME_REAL, 60); // start the game loop to continously draw the viewport, update the audiosystem and drive the physics i/a
+        alert("Use arrowkeys for movement!");
     }
     function update(_event) {
         // f.Physics.world.simulate();  // if physics is included and use
         laser_1Transform.rotateZ(laser_1RotationSpeed * f.Loop.timeFrameReal / 1000);
         if (f.Keyboard.isPressedOne([f.KEYBOARD_CODE.ARROW_UP])) {
-            agentTransform.translateY(agentMovementSpeed * f.Loop.timeFrameReal / 1000);
+            agentMovementSpeed = agentMovementSpeed < agentMaxMovementSpeed ? agentMovementSpeed + agentAccelerationSpeed : agentMaxMovementSpeed;
         }
         if (f.Keyboard.isPressedOne([f.KEYBOARD_CODE.ARROW_DOWN])) {
-            agentTransform.translateY(-agentMovementSpeed * f.Loop.timeFrameReal / 1000);
+            agentMovementSpeed = agentMovementSpeed > -agentMaxMovementSpeed ? agentMovementSpeed - agentAccelerationSpeed : -agentMaxMovementSpeed;
+        }
+        if (!f.Keyboard.isPressedOne([f.KEYBOARD_CODE.ARROW_UP, f.KEYBOARD_CODE.ARROW_DOWN])) {
+            //agentMovementSpeed = agentMovementSpeed > 0 ? agentMovementSpeed - agentFrictionSpeed : 0;
+            //agentMovementSpeed = agentMovementSpeed < 0 ? agentMovementSpeed + agentFrictionSpeed : 0;
+            if (agentMovementSpeed > 0) {
+                agentMovementSpeed -= agentFrictionSpeed;
+            }
+            if (agentMovementSpeed < 0) {
+                agentMovementSpeed += agentFrictionSpeed;
+            }
+            if (Math.round(agentMovementSpeed) == 0) {
+                agentMovementSpeed = 0;
+            }
         }
         if (f.Keyboard.isPressedOne([f.KEYBOARD_CODE.ARROW_LEFT])) {
             agentTransform.rotateZ(agentTurnSpeed * f.Loop.timeFrameReal / 1000);
@@ -72,6 +89,7 @@ var Script;
         if (f.Keyboard.isPressedOne([f.KEYBOARD_CODE.ARROW_RIGHT])) {
             agentTransform.rotateZ(-agentTurnSpeed * f.Loop.timeFrameReal / 1000);
         }
+        agentTransform.translateY(agentMovementSpeed * f.Loop.timeFrameReal / 1000);
         viewport.draw();
         f.AudioManager.default.update();
     }
