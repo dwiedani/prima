@@ -38,8 +38,10 @@ var Script;
     f.Debug.info("Main Program Template running!");
     let viewport;
     document.addEventListener("interactiveViewportStarted", start);
+    let laser_1;
     let laser_1Transform;
     let laser_1RotationSpeed = 270;
+    let agent;
     let agentTransform;
     let agentMaxMovementSpeed = 7.0;
     let agentMaxTurnSpeed = 270;
@@ -51,8 +53,10 @@ var Script;
         let graph = viewport.getBranch();
         let lasers = graph.getChildrenByName("Lasers");
         let agents = graph.getChildrenByName("Agents");
-        laser_1Transform = lasers[0].getChildrenByName("Laser_1")[0].getComponent(f.ComponentTransform).mtxLocal;
-        agentTransform = agents[0].getChildrenByName("Agent_1")[0].getComponent(f.ComponentTransform).mtxLocal;
+        laser_1 = lasers[0].getChildrenByName("Laser_1")[0];
+        laser_1Transform = laser_1.getComponent(f.ComponentTransform).mtxLocal;
+        agent = agents[0].getChildrenByName("Agent_1")[0];
+        agentTransform = agent.getComponent(f.ComponentTransform).mtxLocal;
         viewport.camera.mtxPivot.translateZ(-15);
         //viewport.camera = camera;
         f.Loop.addEventListener("loopFrame" /* LOOP_FRAME */, update);
@@ -60,7 +64,7 @@ var Script;
         alert("Use arrowkeys for movement!");
     }
     function update(_event) {
-        // f.Physics.world.simulate();  // if physics is included and use
+        //f.Physics.world.simulate();  // if physics is included and use
         laser_1Transform.rotateZ(laser_1RotationSpeed * f.Loop.timeFrameReal / 1000);
         let ForwardValue = (f.Keyboard.mapToValue(-1, 0, [f.KEYBOARD_CODE.ARROW_DOWN]) + f.Keyboard.mapToValue(1, 0, [f.KEYBOARD_CODE.ARROW_UP]));
         let TurnValue = (f.Keyboard.mapToValue(-1, 0, [f.KEYBOARD_CODE.ARROW_RIGHT]) + f.Keyboard.mapToValue(1, 0, [f.KEYBOARD_CODE.ARROW_LEFT]));
@@ -68,8 +72,19 @@ var Script;
         agentControlTurn.setInput(TurnValue);
         agentTransform.rotateZ(agentControlTurn.getOutput() * agentMaxTurnSpeed * f.Loop.timeFrameReal / 1000);
         agentTransform.translateY(agentControlForward.getOutput() * agentMaxMovementSpeed * f.Loop.timeFrameReal / 1000);
+        //console.log(f.Vector3.TRANSFORMATION(agent.mtxWorld.translation, laser_1.mtxWorldInverse,true).toString());
+        checkCollision(agent, laser_1.getChildrenByName("LaserArm_1")[0]);
         viewport.draw();
         f.AudioManager.default.update();
+    }
+    function checkCollision(collider, obstacle) {
+        let distance = f.Vector3.TRANSFORMATION(collider.mtxWorld.translation, obstacle.mtxWorldInverse, true);
+        //console.log(distance.toString());
+        let minX = obstacle.getComponent(f.ComponentMesh).mtxPivot.scaling.x / 2 + collider.radius;
+        let minY = obstacle.getComponent(f.ComponentMesh).mtxPivot.scaling.y / 2 + collider.radius;
+        if (distance.x <= (minX) && distance.x >= -(minX) && distance.y <= minY && distance.y >= -(minY)) {
+            alert("Collision happened!");
+        }
     }
 })(Script || (Script = {}));
 //# sourceMappingURL=Script.js.map
