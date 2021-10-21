@@ -44,6 +44,7 @@ var Script;
     let agentMaxMovementSpeed = 7.0;
     let agentTurnSpeed = 270;
     let agentControlForward = new f.Control("Forward", 1, 0 /* PROPORTIONAL */);
+    let agentControlTurn = new f.Control("Turn", 1, 0 /* PROPORTIONAL */);
     agentControlForward.setDelay(500);
     function start(_event) {
         viewport = _event.detail;
@@ -71,11 +72,15 @@ var Script;
             agentControlForward.setInput(0);
         }
         if (f.Keyboard.isPressedOne([f.KEYBOARD_CODE.ARROW_LEFT])) {
-            agentTransform.rotateZ(agentTurnSpeed * f.Loop.timeFrameReal / 1000);
+            agentControlTurn.setInput(agentTurnSpeed);
         }
         if (f.Keyboard.isPressedOne([f.KEYBOARD_CODE.ARROW_RIGHT])) {
-            agentTransform.rotateZ(-agentTurnSpeed * f.Loop.timeFrameReal / 1000);
+            agentControlTurn.setInput(-agentTurnSpeed);
         }
+        if (!f.Keyboard.isPressedOne([f.KEYBOARD_CODE.ARROW_RIGHT, f.KEYBOARD_CODE.ARROW_LEFT])) {
+            agentControlTurn.setInput(0);
+        }
+        agentTransform.rotateZ(agentControlTurn.getOutput() * f.Loop.timeFrameReal / 1000);
         agentTransform.translateY(agentControlForward.getOutput() * f.Loop.timeFrameReal / 1000);
         viewport.draw();
         f.AudioManager.default.update();

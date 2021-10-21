@@ -11,6 +11,7 @@ namespace Script {
   let agentMaxMovementSpeed: number = 7.0;
   let agentTurnSpeed: number = 270;
   let agentControlForward: f.Control = new f.Control("Forward", 1, f.CONTROL_TYPE.PROPORTIONAL);
+  let agentControlTurn: f.Control = new f.Control("Turn", 1, f.CONTROL_TYPE.PROPORTIONAL);
   agentControlForward.setDelay(500);
 
   function start(_event: CustomEvent): void {
@@ -41,17 +42,21 @@ namespace Script {
     if(f.Keyboard.isPressedOne([f.KEYBOARD_CODE.ARROW_DOWN])) {
       agentControlForward.setInput(-agentMaxMovementSpeed);
     }
-
     if(!f.Keyboard.isPressedOne([f.KEYBOARD_CODE.ARROW_UP,f.KEYBOARD_CODE.ARROW_DOWN])) {
       agentControlForward.setInput(0);  
     } 
 
     if(f.Keyboard.isPressedOne([f.KEYBOARD_CODE.ARROW_LEFT])) {
-      agentTransform.rotateZ(agentTurnSpeed * f.Loop.timeFrameReal / 1000);
+      agentControlTurn.setInput(agentTurnSpeed);
     }
     if(f.Keyboard.isPressedOne([f.KEYBOARD_CODE.ARROW_RIGHT])) {
-      agentTransform.rotateZ(-agentTurnSpeed * f.Loop.timeFrameReal / 1000);
+      agentControlTurn.setInput(-agentTurnSpeed);
     }
+    if(!f.Keyboard.isPressedOne([f.KEYBOARD_CODE.ARROW_RIGHT,f.KEYBOARD_CODE.ARROW_LEFT])) {
+      agentControlTurn.setInput(0);  
+    } 
+
+    agentTransform.rotateZ(agentControlTurn.getOutput() * f.Loop.timeFrameReal / 1000);
 
     agentTransform.translateY(agentControlForward.getOutput() * f.Loop.timeFrameReal / 1000);
     
