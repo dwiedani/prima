@@ -42,7 +42,7 @@ var Script;
     let laser_1RotationSpeed = 270;
     let agentTransform;
     let agentMaxMovementSpeed = 7.0;
-    let agentMaxTurnSpeed = 360;
+    let agentMaxTurnSpeed = 270;
     let agentControlForward = new f.Control("Forward", 1, 0 /* PROPORTIONAL */);
     let agentControlTurn = new f.Control("Turn", 1, 0 /* PROPORTIONAL */);
     agentControlForward.setDelay(500);

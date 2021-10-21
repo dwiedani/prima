@@ -9,7 +9,7 @@ namespace Script {
   let laser_1RotationSpeed: number = 270;
   let agentTransform: f.Matrix4x4;
   let agentMaxMovementSpeed: number = 7.0;
-  let agentMaxTurnSpeed: number = 360;
+  let agentMaxTurnSpeed: number = 270;
   let agentControlForward: f.Control = new f.Control("Forward", 1, f.CONTROL_TYPE.PROPORTIONAL);
   let agentControlTurn: f.Control = new f.Control("Turn", 1, f.CONTROL_TYPE.PROPORTIONAL);
   agentControlForward.setDelay(500);
