@@ -66,7 +66,6 @@ namespace Script {
 
   function checkCollision(collider:f.Node, obstacle: f.Node) {
     let distance: f.Vector3 = f.Vector3.TRANSFORMATION(collider.mtxWorld.translation, obstacle.mtxWorldInverse,true);   
-    //console.log(distance.toString());
     let minX = obstacle.getComponent(f.ComponentMesh).mtxPivot.scaling.x/2 + collider.radius;
     let minY = obstacle.getComponent(f.ComponentMesh).mtxPivot.scaling.y/2 + collider.radius;
     if(distance.x <= (minX) && distance.x >= -(minX) && distance.y <= minY && distance.y >= -(minY)) {
