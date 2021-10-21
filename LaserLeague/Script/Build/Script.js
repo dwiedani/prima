@@ -42,7 +42,7 @@ var Script;
     let laser_1RotationSpeed = 270;
     let agentTransform;
     let agentMaxMovementSpeed = 7.0;
-    let agentTurnSpeed = 270;
+    let agentMaxTurnSpeed = 360;
     let agentControlForward = new f.Control("Forward", 1, 0 /* PROPORTIONAL */);
     let agentControlTurn = new f.Control("Turn", 1, 0 /* PROPORTIONAL */);
     agentControlForward.setDelay(500);
@@ -62,26 +62,12 @@ var Script;
     function update(_event) {
         // f.Physics.world.simulate();  // if physics is included and use
         laser_1Transform.rotateZ(laser_1RotationSpeed * f.Loop.timeFrameReal / 1000);
-        if (f.Keyboard.isPressedOne([f.KEYBOARD_CODE.ARROW_UP])) {
-            agentControlForward.setInput(agentMaxMovementSpeed);
-        }
-        if (f.Keyboard.isPressedOne([f.KEYBOARD_CODE.ARROW_DOWN])) {
-            agentControlForward.setInput(-agentMaxMovementSpeed);
-        }
-        if (!f.Keyboard.isPressedOne([f.KEYBOARD_CODE.ARROW_UP, f.KEYBOARD_CODE.ARROW_DOWN])) {
-            agentControlForward.setInput(0);
-        }
-        if (f.Keyboard.isPressedOne([f.KEYBOARD_CODE.ARROW_LEFT])) {
-            agentControlTurn.setInput(agentTurnSpeed);
-        }
-        if (f.Keyboard.isPressedOne([f.KEYBOARD_CODE.ARROW_RIGHT])) {
-            agentControlTurn.setInput(-agentTurnSpeed);
-        }
-        if (!f.Keyboard.isPressedOne([f.KEYBOARD_CODE.ARROW_RIGHT, f.KEYBOARD_CODE.ARROW_LEFT])) {
-            agentControlTurn.setInput(0);
-        }
-        agentTransform.rotateZ(agentControlTurn.getOutput() * f.Loop.timeFrameReal / 1000);
-        agentTransform.translateY(agentControlForward.getOutput() * f.Loop.timeFrameReal / 1000);
+        let ForwardValue = (f.Keyboard.mapToValue(-1, 0, [f.KEYBOARD_CODE.ARROW_DOWN]) + f.Keyboard.mapToValue(1, 0, [f.KEYBOARD_CODE.ARROW_UP]));
+        let TurnValue = (f.Keyboard.mapToValue(-1, 0, [f.KEYBOARD_CODE.ARROW_RIGHT]) + f.Keyboard.mapToValue(1, 0, [f.KEYBOARD_CODE.ARROW_LEFT]));
+        agentControlForward.setInput(ForwardValue);
+        agentControlTurn.setInput(TurnValue);
+        agentTransform.rotateZ(agentControlTurn.getOutput() * agentMaxTurnSpeed * f.Loop.timeFrameReal / 1000);
+        agentTransform.translateY(agentControlForward.getOutput() * agentMaxMovementSpeed * f.Loop.timeFrameReal / 1000);
         viewport.draw();
         f.AudioManager.default.update();
     }
