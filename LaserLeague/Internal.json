@@ -82,6 +82,13 @@
       }
     }
   },
+  "MeshPyramid|2021-10-25T14:07:10.457Z|04917": {
+    "ƒ.MeshPyramid": {
+      "idResource": "MeshPyramid|2021-10-25T14:07:10.457Z|04917",
+      "name": "MeshPyramid",
+      "type": "MeshPyramid"
+    }
+  },
   "Graph|2021-10-07T13:16:51.100Z|50510": {
     "ƒ.Graph": {
       "name": "Scene",
@@ -391,9 +398,9 @@
                               "ƒ.ComponentMesh": {
                                 "idMesh": "MeshPyramid|2021-10-25T14:07:10.457Z|04917",
                                 "pivot": {
-                                  "translation": "[0, 0, 0]",
+                                  "translation": "[0, -0.10000000149011612, 1.6000001430511475]",
                                   "rotation": "[0, 0, 0]",
-                                  "scaling": "[1, 1, 1]"
+                                  "scaling": "[0.20000001788139343, 0.20000001788139343, 0.20000001788139343]"
                                 },
                                 "Component": {
                                   "active": true
@@ -423,9 +430,9 @@
                             {
                               "ƒ.ComponentTransform": {
                                 "local": {
-                                  "translation": "[0, -0.20000000298023224, 1.5000001192092896]",
+                                  "translation": "[0, 0, 0]",
                                   "rotation": "[0, 0, 0]",
-                                  "scaling": "[0.5, 0.5, 0.5]"
+                                  "scaling": "[1, 1, 1]"
                                 },
                                 "Component": {
                                   "active": true
@@ -929,13 +936,6 @@
       ],
       "idResource": "Graph|2021-10-07T13:16:51.100Z|50510",
       "type": "Graph"
-    }
-  },
-  "MeshPyramid|2021-10-25T14:07:10.457Z|04917": {
-    "ƒ.MeshPyramid": {
-      "idResource": "MeshPyramid|2021-10-25T14:07:10.457Z|04917",
-      "name": "MeshPyramid",
-      "type": "MeshPyramid"
     }
   }
 }
