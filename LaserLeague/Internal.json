@@ -386,6 +386,22 @@
                           }
                         }
                       }
+                    ],
+                    "AgentComponentScript": [
+                      {
+                        "Script.AgentComponentScript": {
+                          "active": true,
+                          "message": "AgentComponentScript added to ",
+                          "agentCanMove": true,
+                          "agentStartPosition": {
+                            "x": 0,
+                            "y": 0,
+                            "z": 0
+                          },
+                          "agentMaxMovementSpeed": 7,
+                          "agentMaxTurnSpeed": 270
+                        }
+                      }
                     ]
                   },
                   "children": []
@@ -447,6 +463,16 @@
                           "Component": {
                             "active": true
                           }
+                        }
+                      }
+                    ],
+                    "LaserComponentScript": [
+                      {
+                        "Script.LaserComponentScript": {
+                          "active": true,
+                          "message": "LaserComponentScript added to ",
+                          "laserRotationSpeed": 270,
+                          "turnDirection": -1
                         }
                       }
                     ]
@@ -668,6 +694,16 @@
                           "Component": {
                             "active": true
                           }
+                        }
+                      }
+                    ],
+                    "LaserComponentScript": [
+                      {
+                        "Script.LaserComponentScript": {
+                          "active": true,
+                          "message": "LaserComponentScript added to ",
+                          "laserRotationSpeed": 120,
+                          "turnDirection": 1
                         }
                       }
                     ]
