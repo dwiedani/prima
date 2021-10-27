@@ -133,7 +133,6 @@ var Script;
         hndEvent = (_event) => {
             switch (_event.type) {
                 case "componentAdd" /* COMPONENT_ADD */:
-                    f.Debug.log(this.message, this.node);
                     f.Loop.addEventListener("loopFrame" /* LOOP_FRAME */, this.update);
                     break;
                 case "componentRemove" /* COMPONENT_REMOVE */:
@@ -156,14 +155,12 @@ var Script;
     function start(_event) {
         viewport = _event.detail;
         let graph = viewport.getBranch();
-        let laserCollection = graph.getChildrenByName("Lasers")[0];
-        lasers = laserCollection.getChildrenByName("Laser");
+        lasers = graph.getChildrenByName("Lasers")[0].getChildrenByName("Laser");
         let agents = graph.getChildrenByName("Agents");
         agent = agents[0].getChildrenByName("Agent_1")[0].getComponent(Script.AgentComponentScript);
         viewport.camera.mtxPivot.translateZ(-15);
         f.Loop.addEventListener("loopFrame" /* LOOP_FRAME */, update);
         f.Loop.start(f.LOOP_MODE.TIME_REAL, 60); // start the game loop to continously draw the viewport, update the audiosystem and drive the physics i/a
-        alert("Use arrowkeys for movement!");
     }
     function update(_event) {
         //f.Physics.world.simulate();  // if physics is included and use

@@ -10,16 +10,16 @@ namespace Script {
   function start(_event: CustomEvent): void {
     viewport = _event.detail;
     let graph: f.Node = viewport.getBranch();
-    let laserCollection: f.Node = graph.getChildrenByName("Lasers")[0];
-    lasers = laserCollection.getChildrenByName("Laser");
+
+    lasers = graph.getChildrenByName("Lasers")[0].getChildrenByName("Laser");
+
     let agents: f.Node[] = graph.getChildrenByName("Agents");
     agent = agents[0].getChildrenByName("Agent_1")[0].getComponent(AgentComponentScript);
+    
     viewport.camera.mtxPivot.translateZ(-15);
     
     f.Loop.addEventListener(f.EVENT.LOOP_FRAME, update);
     f.Loop.start(f.LOOP_MODE.TIME_REAL, 60);  // start the game loop to continously draw the viewport, update the audiosystem and drive the physics i/a
-
-    alert("Use arrowkeys for movement!");
   }
 
   function update(_event: Event): void {

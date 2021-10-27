@@ -30,7 +30,6 @@ namespace Script {
     public hndEvent = (_event: Event) => {
       switch (_event.type) {
         case f.EVENT.COMPONENT_ADD:
-          f.Debug.log(this.message, this.node);
           f.Loop.addEventListener(f.EVENT.LOOP_FRAME, this.update);
           break;
         case f.EVENT.COMPONENT_REMOVE:
