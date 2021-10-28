@@ -30,6 +30,7 @@ namespace Script {
       this.addEventListener(f.EVENT.COMPONENT_REMOVE, this.hndEvent);
     }
 
+
     public create = () => {
       this.agentTransform = this.node.getComponent(f.ComponentTransform).mtxLocal;
       this.agentStartPosition = new f.Vector3(this.node.mtxWorld.translation.x,this.node.mtxWorld.translation.y,this.node.mtxWorld.translation.z);
@@ -37,6 +38,7 @@ namespace Script {
 
       f.Loop.addEventListener(f.EVENT.LOOP_FRAME, this.update);
     }
+
 
     public update = (_event: Event) => {
       let forwardValue: number = (
@@ -55,6 +57,7 @@ namespace Script {
       }
     }
 
+
     public respawn = () => {
 
       this.agentTransform.mutate({
@@ -72,6 +75,7 @@ namespace Script {
         this.agentControlForward.setDelay(500);
       }, 500);
     }
+    
 
     // Activate the functions of this component as response to events
     public hndEvent = (_event: Event) => {

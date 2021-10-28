@@ -151,16 +151,33 @@ var Script;
     let viewport;
     document.addEventListener("interactiveViewportStarted", start);
     let lasers;
+    let laserParent;
     let agent;
     function start(_event) {
         viewport = _event.detail;
         let graph = viewport.getBranch();
-        lasers = graph.getChildrenByName("Lasers")[0].getChildrenByName("Laser");
+        laserParent = graph.getChildrenByName("Lasers")[0];
+        createLaser().then(() => {
+            lasers = graph.getChildrenByName("Lasers")[0].getChildrenByName("Laser");
+            f.Loop.addEventListener("loopFrame" /* LOOP_FRAME */, update);
+        });
         let agents = graph.getChildrenByName("Agents");
         agent = agents[0].getChildrenByName("Agent_1")[0].getComponent(Script.AgentComponentScript);
         viewport.camera.mtxPivot.translateZ(-15);
-        f.Loop.addEventListener("loopFrame" /* LOOP_FRAME */, update);
         f.Loop.start(f.LOOP_MODE.TIME_REAL, 60); // start the game loop to continously draw the viewport, update the audiosystem and drive the physics i/a
+    }
+    async function createLaser() {
+        for (let y = -1; y <= 1; y += 2) {
+            for (let x = -1; x <= 1; x++) {
+                let graphLaser = FudgeCore.Project.resources["Graph|2021-10-28T13:19:34.470Z|50414"];
+                let laser = await f.Project.createGraphInstance(graphLaser);
+                let laserPosition = new f.Vector3(x * 4, y * 3, 1);
+                laser.getComponent(f.ComponentTransform).mtxLocal.mutate({
+                    translation: laserPosition,
+                });
+                laserParent.addChild(laser);
+            }
+        }
     }
     function update(_event) {
         //f.Physics.world.simulate();  // if physics is included and use

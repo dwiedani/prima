@@ -5,26 +5,49 @@ namespace Script {
   let viewport: f.Viewport;
   document.addEventListener("interactiveViewportStarted", <EventListener>start);
   let lasers: f.Node[];
+  let laserParent: f.Node;
   let agent: AgentComponentScript;
 
   function start(_event: CustomEvent): void {
     viewport = _event.detail;
     let graph: f.Node = viewport.getBranch();
 
-    lasers = graph.getChildrenByName("Lasers")[0].getChildrenByName("Laser");
+    laserParent = graph.getChildrenByName("Lasers")[0];
 
+
+    createLaser().then(()=>{
+      lasers = graph.getChildrenByName("Lasers")[0].getChildrenByName("Laser");
+      f.Loop.addEventListener(f.EVENT.LOOP_FRAME, update);
+    });
+    
     let agents: f.Node[] = graph.getChildrenByName("Agents");
     agent = agents[0].getChildrenByName("Agent_1")[0].getComponent(AgentComponentScript);
     
     viewport.camera.mtxPivot.translateZ(-15);
     
-    f.Loop.addEventListener(f.EVENT.LOOP_FRAME, update);
     f.Loop.start(f.LOOP_MODE.TIME_REAL, 60);  // start the game loop to continously draw the viewport, update the audiosystem and drive the physics i/a
+  }
+
+  async function createLaser() {
+    for (let y = -1; y <= 1; y+=2) {
+      for (let x = -1; x <= 1; x++) {
+        let graphLaser: f.Graph = <f.Graph>FudgeCore.Project.resources["Graph|2021-10-28T13:19:34.470Z|50414"];
+        let laser = await f.Project.createGraphInstance(graphLaser);
+        let laserPosition: f.Vector3 = new f.Vector3(x*4,y*3,1)
+        laser.getComponent(f.ComponentTransform).mtxLocal.mutate(
+          {
+            translation: laserPosition,
+          }
+        );
+        laserParent.addChild(laser);      
+      }
+    }
   }
 
   function update(_event: Event): void {
     //f.Physics.world.simulate();  // if physics is included and use
-    lasers.forEach(laser => {
+    
+    lasers.forEach( laser => {
       let laserBeams: f.Node[] = laser.getChildrenByName("LaserArm");
       laserBeams.forEach(beam => {
         checkCollision(agent.node,beam);
