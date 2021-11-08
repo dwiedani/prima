@@ -1,6 +1,6 @@
-namespace Script {
+namespace LaserLeague {
   import f = FudgeCore;
-  f.Project.registerScriptNamespace(Script);  // Register the namespace to FUDGE for serialization
+  f.Project.registerScriptNamespace(LaserLeague);  // Register the namespace to FUDGE for serialization
 
   export class AgentComponentScript extends f.ComponentScript {
     // Register the script as component for use in the editor via drag&drop
@@ -8,7 +8,7 @@ namespace Script {
     // Properties may be mutated by users in the editor via the automatically created user interface
     public message: string = "AgentComponentScript added to ";
     public agentCanMove: boolean = true;
-    public agentStartPosition: f.Vector3;
+    public agentStartPosition: f.Vector3 = new f.Vector3(0,0,1);
     public agentMaxMovementSpeed: number = 7.0;
     public agentMaxTurnSpeed: number = 270;
     public agentControlForward: f.Control;
@@ -33,9 +33,6 @@ namespace Script {
 
     public create = () => {
       this.agentTransform = this.node.getComponent(f.ComponentTransform).mtxLocal;
-      this.agentStartPosition = new f.Vector3(this.node.mtxWorld.translation.x,this.node.mtxWorld.translation.y,this.node.mtxWorld.translation.z);
-      console.log(this.agentStartPosition);
-
       f.Loop.addEventListener(f.EVENT.LOOP_FRAME, this.update);
     }
 

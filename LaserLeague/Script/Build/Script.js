@@ -1,15 +1,29 @@
 "use strict";
-var Script;
-(function (Script) {
+var LaserLeague;
+(function (LaserLeague) {
     var f = FudgeCore;
-    f.Project.registerScriptNamespace(Script); // Register the namespace to FUDGE for serialization
+    class Agent extends f.Node {
+        constructor() {
+            super("NewAgent");
+            this.addComponent(new f.ComponentTransform);
+            this.addComponent(new f.ComponentMesh(new f.MeshSphere("MeshAgent")));
+            this.addComponent(new f.ComponentMaterial(new f.Material("mtrAgent", f.ShaderUniColor, new f.CoatColored(new f.Color(1, 0, 0, 1)))));
+            this.addComponent(new LaserLeague.AgentComponentScript);
+        }
+    }
+    LaserLeague.Agent = Agent;
+})(LaserLeague || (LaserLeague = {}));
+var LaserLeague;
+(function (LaserLeague) {
+    var f = FudgeCore;
+    f.Project.registerScriptNamespace(LaserLeague); // Register the namespace to FUDGE for serialization
     class AgentComponentScript extends f.ComponentScript {
         // Register the script as component for use in the editor via drag&drop
         static iSubclass = f.Component.registerSubclass(AgentComponentScript);
         // Properties may be mutated by users in the editor via the automatically created user interface
         message = "AgentComponentScript added to ";
         agentCanMove = true;
-        agentStartPosition;
+        agentStartPosition = new f.Vector3(0, 0, 1);
         agentMaxMovementSpeed = 7.0;
         agentMaxTurnSpeed = 270;
         agentControlForward;
@@ -29,8 +43,6 @@ var Script;
         }
         create = () => {
             this.agentTransform = this.node.getComponent(f.ComponentTransform).mtxLocal;
-            this.agentStartPosition = new f.Vector3(this.node.mtxWorld.translation.x, this.node.mtxWorld.translation.y, this.node.mtxWorld.translation.z);
-            console.log(this.agentStartPosition);
             f.Loop.addEventListener("loopFrame" /* LOOP_FRAME */, this.update);
         };
         update = (_event) => {
@@ -71,8 +83,8 @@ var Script;
             }
         };
     }
-    Script.AgentComponentScript = AgentComponentScript;
-})(Script || (Script = {}));
+    LaserLeague.AgentComponentScript = AgentComponentScript;
+})(LaserLeague || (LaserLeague = {}));
 var Script;
 (function (Script) {
     var f = FudgeCore;
@@ -106,10 +118,10 @@ var Script;
     }
     Script.CustomComponentScript = CustomComponentScript;
 })(Script || (Script = {}));
-var Script;
-(function (Script) {
+var LaserLeague;
+(function (LaserLeague) {
     var f = FudgeCore;
-    f.Project.registerScriptNamespace(Script); // Register the namespace to FUDGE for serialization
+    f.Project.registerScriptNamespace(LaserLeague); // Register the namespace to FUDGE for serialization
     class LaserComponentScript extends f.ComponentScript {
         // Register the script as component for use in the editor via drag&drop
         static iSubclass = f.Component.registerSubclass(LaserComponentScript);
@@ -142,10 +154,10 @@ var Script;
             }
         };
     }
-    Script.LaserComponentScript = LaserComponentScript;
-})(Script || (Script = {}));
-var Script;
-(function (Script) {
+    LaserLeague.LaserComponentScript = LaserComponentScript;
+})(LaserLeague || (LaserLeague = {}));
+var LaserLeague;
+(function (LaserLeague) {
     var f = FudgeCore;
     f.Debug.info("Main Program Template running!");
     let viewport;
@@ -159,34 +171,45 @@ var Script;
         laserParent = graph.getChildrenByName("Lasers")[0];
         createLaser().then(() => {
             lasers = graph.getChildrenByName("Lasers")[0].getChildrenByName("Laser");
-            f.Loop.addEventListener("loopFrame" /* LOOP_FRAME */, update);
         });
         let agents = graph.getChildrenByName("Agents");
-        agent = agents[0].getChildrenByName("Agent_1")[0].getComponent(Script.AgentComponentScript);
-        viewport.camera.mtxPivot.translateZ(-15);
+        let agentNode = new LaserLeague.Agent();
+        agents[0].addChild(agentNode);
+        agent = agentNode.getComponent(LaserLeague.AgentComponentScript);
+        console.log(agentNode);
+        viewport.camera.mtxPivot.translateZ(-25);
+        f.Loop.addEventListener("loopFrame" /* LOOP_FRAME */, update);
         f.Loop.start(f.LOOP_MODE.TIME_REAL, 60); // start the game loop to continously draw the viewport, update the audiosystem and drive the physics i/a
+    }
+    function randomIntFromInterval(min, max) {
+        return Math.floor(Math.random() * (max - min + 1) + min);
     }
     async function createLaser() {
         for (let y = -1; y <= 1; y += 2) {
             for (let x = -1; x <= 1; x++) {
                 let graphLaser = FudgeCore.Project.resources["Graph|2021-10-28T13:19:34.470Z|50414"];
                 let laser = await f.Project.createGraphInstance(graphLaser);
-                let laserPosition = new f.Vector3(x * 4, y * 3, 1);
+                let laserPosition = new f.Vector3(x * 6, y * 4, 1);
                 laser.getComponent(f.ComponentTransform).mtxLocal.mutate({
                     translation: laserPosition,
                 });
+                laser.getComponent(LaserLeague.LaserComponentScript).laserRotationSpeed = randomIntFromInterval(90, 270);
+                let turnDirection = randomIntFromInterval(-1, 1);
+                laser.getComponent(LaserLeague.LaserComponentScript).turnDirection = turnDirection != 0 ? turnDirection : 1;
                 laserParent.addChild(laser);
             }
         }
     }
     function update(_event) {
         //f.Physics.world.simulate();  // if physics is included and use
-        lasers.forEach(laser => {
-            let laserBeams = laser.getChildrenByName("LaserArm");
-            laserBeams.forEach(beam => {
-                checkCollision(agent.node, beam);
+        if (lasers) {
+            lasers.forEach(laser => {
+                let laserBeams = laser.getChildrenByName("LaserArm");
+                laserBeams.forEach(beam => {
+                    checkCollision(agent.node, beam);
+                });
             });
-        });
+        }
         viewport.draw();
         f.AudioManager.default.update();
     }
@@ -198,5 +221,5 @@ var Script;
             agent.respawn();
         }
     }
-})(Script || (Script = {}));
+})(LaserLeague || (LaserLeague = {}));
 //# sourceMappingURL=Script.js.map

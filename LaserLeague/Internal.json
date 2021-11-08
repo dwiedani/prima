@@ -154,7 +154,7 @@
                     "local": {
                       "translation": "[0, 0, 0]",
                       "rotation": "[0, 0, 0]",
-                      "scaling": "[15, 10, 1]"
+                      "scaling": "[20, 15, 1]"
                     },
                     "Component": {
                       "active": true
@@ -335,74 +335,7 @@
           "ƒ.Node": {
             "name": "Agents",
             "components": {},
-            "children": [
-              {
-                "ƒ.Node": {
-                  "name": "Agent_1",
-                  "components": {
-                    "ComponentMesh": [
-                      {
-                        "ƒ.ComponentMesh": {
-                          "idMesh": "MeshSphere|2021-10-14T12:40:03.314Z|56795",
-                          "pivot": {
-                            "translation": "[0, 0, 1]",
-                            "rotation": "[0, 0, 0]",
-                            "scaling": "[1, 1, 1]"
-                          },
-                          "Component": {
-                            "active": true
-                          }
-                        }
-                      }
-                    ],
-                    "ComponentMaterial": [
-                      {
-                        "ƒ.ComponentMaterial": {
-                          "sortForAlpha": false,
-                          "clrPrimary": "[1, 1, 1, 1]",
-                          "clrSecondary": "[1, 1, 1, 1]",
-                          "pivot": {
-                            "translation": "[0, 0]",
-                            "rotation": 0,
-                            "scaling": "[1, 1]"
-                          },
-                          "Component": {
-                            "active": true
-                          },
-                          "idMaterial": "Material|2021-10-14T12:38:18.686Z|85379"
-                        }
-                      }
-                    ],
-                    "ComponentTransform": [
-                      {
-                        "ƒ.ComponentTransform": {
-                          "local": {
-                            "translation": "[0, 0, 0]",
-                            "rotation": "[0, 0, 0]",
-                            "scaling": "[1, 1, 1]"
-                          },
-                          "Component": {
-                            "active": true
-                          }
-                        }
-                      }
-                    ],
-                    "AgentComponentScript": [
-                      {
-                        "Script.AgentComponentScript": {
-                          "active": true,
-                          "message": "AgentComponentScript added to ",
-                          "agentCanMove": true,
-                          "agentMaxMovementSpeed": 7,
-                          "agentMaxTurnSpeed": 270
-                        }
-                      }
-                    ]
-                  },
-                  "children": []
-                }
-              }
-            ]
+            "children": []
           }
         },
         {
@@ -503,7 +436,7 @@
         ],
         "LaserComponentScript": [
           {
-            "Script.LaserComponentScript": {
+            "LaserLeague.LaserComponentScript": {
               "active": true,
               "message": "LaserComponentScript added to ",
               "laserRotationSpeed": 270,

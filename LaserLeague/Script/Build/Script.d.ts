@@ -1,4 +1,10 @@
-declare namespace Script {
+declare namespace LaserLeague {
+    import f = FudgeCore;
+    class Agent extends f.Node {
+        constructor();
+    }
+}
+declare namespace LaserLeague {
     import f = FudgeCore;
     class AgentComponentScript extends f.ComponentScript {
         static readonly iSubclass: number;
@@ -26,7 +32,7 @@ declare namespace Script {
         hndEvent: (_event: Event) => void;
     }
 }
-declare namespace Script {
+declare namespace LaserLeague {
     import f = FudgeCore;
     class LaserComponentScript extends f.ComponentScript {
         static readonly iSubclass: number;
@@ -38,5 +44,5 @@ declare namespace Script {
         hndEvent: (_event: Event) => void;
     }
 }
-declare namespace Script {
+declare namespace LaserLeague {
 }
