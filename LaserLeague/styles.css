@@ -14,3 +14,17 @@ canvas.fullscreen {
   width: 100vw; 
   height: 100vh; 
 }
+
+.ui {
+  position: absolute;
+  left: 0;
+  top: 0;
+  background-color: white;
+  margin: 1rem;
+  padding: 1rem;
+  border-radius: 15px;
+}
+
+.ui-health {
+  width: 100%;
+}

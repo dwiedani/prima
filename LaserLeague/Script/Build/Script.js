@@ -3,12 +3,19 @@ var LaserLeague;
 (function (LaserLeague) {
     var f = FudgeCore;
     class Agent extends f.Node {
-        constructor() {
-            super("NewAgent");
+        agentName;
+        hit;
+        constructor(agentName) {
+            super(agentName);
+            this.agentName = agentName;
+            LaserLeague.GameState.get().name = this.agentName;
             this.addComponent(new f.ComponentTransform);
             this.addComponent(new f.ComponentMesh(new f.MeshSphere("MeshAgent")));
             this.addComponent(new f.ComponentMaterial(new f.Material("mtrAgent", f.ShaderUniColor, new f.CoatColored(new f.Color(1, 0, 0, 1)))));
             this.addComponent(new LaserLeague.AgentComponentScript);
+        }
+        getName() {
+            return this.agentName;
         }
     }
     LaserLeague.Agent = Agent;
@@ -121,6 +128,29 @@ var Script;
 var LaserLeague;
 (function (LaserLeague) {
     var f = FudgeCore;
+    var fui = FudgeUserInterface;
+    class GameState extends f.Mutable {
+        static controller;
+        static instance;
+        name = "LaserLeague";
+        health = 100;
+        constructor() {
+            super();
+            let domHud = document.querySelector("#ui");
+            GameState.instance = this;
+            GameState.controller = new fui.Controller(this, domHud);
+            console.log("Hud-Controller", GameState.controller);
+        }
+        static get() {
+            return GameState.instance || new GameState();
+        }
+        reduceMutator(_mutator) { }
+    }
+    LaserLeague.GameState = GameState;
+})(LaserLeague || (LaserLeague = {}));
+var LaserLeague;
+(function (LaserLeague) {
+    var f = FudgeCore;
     f.Project.registerScriptNamespace(LaserLeague); // Register the namespace to FUDGE for serialization
     class LaserComponentScript extends f.ComponentScript {
         // Register the script as component for use in the editor via drag&drop
@@ -162,6 +192,7 @@ var LaserLeague;
     f.Debug.info("Main Program Template running!");
     let viewport;
     document.addEventListener("interactiveViewportStarted", start);
+    let agentNode;
     let lasers;
     let laserParent;
     let agent;
@@ -173,10 +204,12 @@ var LaserLeague;
             lasers = graph.getChildrenByName("Lasers")[0].getChildrenByName("Laser");
         });
         let agents = graph.getChildrenByName("Agents");
-        let agentNode = new LaserLeague.Agent();
+        agentNode = new LaserLeague.Agent("Agent 007");
         agents[0].addChild(agentNode);
         agent = agentNode.getComponent(LaserLeague.AgentComponentScript);
-        console.log(agentNode);
+        setTimeout(() => {
+            respawnAgents([agent]);
+        }, 100);
         viewport.camera.mtxPivot.translateZ(-25);
         f.Loop.addEventListener("loopFrame" /* LOOP_FRAME */, update);
         f.Loop.start(f.LOOP_MODE.TIME_REAL, 60); // start the game loop to continously draw the viewport, update the audiosystem and drive the physics i/a
@@ -206,7 +239,7 @@ var LaserLeague;
             lasers.forEach(laser => {
                 let laserBeams = laser.getChildrenByName("LaserArm");
                 laserBeams.forEach(beam => {
-                    checkCollision(agent.node, beam);
+                    checkCollision(agentNode, beam);
                 });
             });
         }
@@ -218,8 +251,24 @@ var LaserLeague;
         let minX = obstacle.getComponent(f.ComponentMesh).mtxPivot.scaling.x / 2 + collider.radius;
         let minY = obstacle.getComponent(f.ComponentMesh).mtxPivot.scaling.y + collider.radius;
         if (distance.x <= (minX) && distance.x >= -(minX) && distance.y <= minY && distance.y >= 0) {
-            agent.respawn();
+            if (!collider.hit) {
+                collider.hit = true;
+                LaserLeague.GameState.get().health -= 10;
+                const agentHealth = LaserLeague.GameState.get().health;
+                if (agentHealth <= 1) {
+                    respawnAgents([collider.getComponent(LaserLeague.AgentComponentScript)]);
+                }
+                setTimeout(() => {
+                    collider.hit = false;
+                }, 500);
+            }
         }
+    }
+    function respawnAgents(agents) {
+        agents.forEach(agent => {
+            agent.respawn();
+        });
+        LaserLeague.GameState.get().health = 100;
     }
 })(LaserLeague || (LaserLeague = {}));
 //# sourceMappingURL=Script.js.map

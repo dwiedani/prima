@@ -2,8 +2,14 @@ namespace LaserLeague {
     import f = FudgeCore;
   
     export class Agent extends f.Node {
-      constructor() {
-        super("NewAgent");
+      
+      private agentName: string;
+      public hit: boolean;
+
+      constructor(agentName: string) {
+        super(agentName);
+        this.agentName = agentName;
+        GameState.get().name = this.agentName;
   
         this.addComponent(new f.ComponentTransform);
   
@@ -13,6 +19,10 @@ namespace LaserLeague {
           )
         );
         this.addComponent(new AgentComponentScript);
+      }
+
+      public getName(): string {
+        return this.agentName;
       }
     }
   }

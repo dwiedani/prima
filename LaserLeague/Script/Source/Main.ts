@@ -4,6 +4,7 @@ namespace LaserLeague {
 
   let viewport: f.Viewport;
   document.addEventListener("interactiveViewportStarted", <EventListener>start);
+  let agentNode: Agent;
   let lasers: f.Node[];
   let laserParent: f.Node;
   let agent: AgentComponentScript;
@@ -21,11 +22,14 @@ namespace LaserLeague {
     
     let agents: f.Node[] = graph.getChildrenByName("Agents");
 
-    let agentNode = new Agent();
+    agentNode = new Agent("Agent 007");
     agents[0].addChild(agentNode);
-
     agent = agentNode.getComponent(AgentComponentScript);
-    console.log(agentNode);
+
+    setTimeout(()=>{
+      respawnAgents([agent]);
+    },100)
+    
     
     viewport.camera.mtxPivot.translateZ(-25);
 
@@ -63,7 +67,7 @@ namespace LaserLeague {
       lasers.forEach( laser => {
         let laserBeams: f.Node[] = laser.getChildrenByName("LaserArm");
         laserBeams.forEach(beam => {
-          checkCollision(agent.node,beam);
+          checkCollision(agentNode,beam);
         });
       });
     }
@@ -72,13 +76,33 @@ namespace LaserLeague {
     f.AudioManager.default.update();
   }
 
-  function checkCollision(collider:f.Node, obstacle: f.Node) {
+  function checkCollision(collider:Agent, obstacle: f.Node) {
     let distance: f.Vector3 = f.Vector3.TRANSFORMATION(collider.mtxWorld.translation, obstacle.mtxWorldInverse,true);   
     let minX = obstacle.getComponent(f.ComponentMesh).mtxPivot.scaling.x/2 + collider.radius;
     let minY = obstacle.getComponent(f.ComponentMesh).mtxPivot.scaling.y + collider.radius;
     if(distance.x <= (minX) && distance.x >= -(minX) && distance.y <= minY && distance.y >= 0) {
-      agent.respawn();
+        if(!collider.hit){
+          collider.hit = true
+          GameState.get().health -= 10;
+          const agentHealth = GameState.get().health;
+
+          if(agentHealth <= 1) {
+            respawnAgents([collider.getComponent(AgentComponentScript)]);
+          }
+
+          setTimeout(()=>{
+            collider.hit = false;
+          },500)
+        }
+        
     }
+  }
+
+  function respawnAgents(agents:AgentComponentScript[]) {
+    agents.forEach(agent => {
+      agent.respawn();
+    });
+    GameState.get().health = 100;
   }
 
 }

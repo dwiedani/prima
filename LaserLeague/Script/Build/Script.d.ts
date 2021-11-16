@@ -1,7 +1,10 @@
 declare namespace LaserLeague {
     import f = FudgeCore;
     class Agent extends f.Node {
-        constructor();
+        private agentName;
+        hit: boolean;
+        constructor(agentName: string);
+        getName(): string;
     }
 }
 declare namespace LaserLeague {
@@ -30,6 +33,18 @@ declare namespace Script {
         message: string;
         constructor();
         hndEvent: (_event: Event) => void;
+    }
+}
+declare namespace LaserLeague {
+    import f = FudgeCore;
+    class GameState extends f.Mutable {
+        private static controller;
+        private static instance;
+        name: string;
+        health: number;
+        private constructor();
+        static get(): GameState;
+        protected reduceMutator(_mutator: f.Mutator): void;
     }
 }
 declare namespace LaserLeague {
