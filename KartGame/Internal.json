@@ -1,0 +1,200 @@
+{
+  "Graph|2021-11-23T13:53:15.504Z|06927": {
+    "ƒ.Graph": {
+      "name": "Scene",
+      "components": {},
+      "children": [
+        {
+          "ƒ.Node": {
+            "name": "Terrain",
+            "components": {
+              "ComponentMesh": [
+                {
+                  "ƒ.ComponentMesh": {
+                    "idMesh": "MeshRelief|2021-11-23T13:53:30.668Z|19102",
+                    "pivot": {
+                      "translation": "[0, 0, 0]",
+                      "rotation": "[0, 0, 0]",
+                      "scaling": "[100, 10, 100]"
+                    },
+                    "Component": {
+                      "active": true
+                    }
+                  }
+                }
+              ],
+              "ComponentLight": [
+                {
+                  "ƒ.ComponentLight": {
+                    "pivot": {
+                      "translation": "[0, 0, 0]",
+                      "rotation": "[0, 0, 0]",
+                      "scaling": "[5, 1, 5]"
+                    },
+                    "light": {
+                      "ƒ.LightAmbient": {
+                        "color": "[0.25098039215686274, 0.25098039215686274, 0.25098039215686274, 1]"
+                      }
+                    }
+                  }
+                },
+                {
+                  "ƒ.ComponentLight": {
+                    "pivot": {
+                      "translation": "[0, 0, 0]",
+                      "rotation": "[45, 0, 0]",
+                      "scaling": "[1, 1, 1]"
+                    },
+                    "light": {
+                      "ƒ.LightDirectional": {
+                        "color": "[1, 1, 1, 1]"
+                      }
+                    }
+                  }
+                }
+              ],
+              "ComponentMaterial": [
+                {
+                  "ƒ.ComponentMaterial": {
+                    "sortForAlpha": false,
+                    "clrPrimary": "[1, 1, 1, 1]",
+                    "clrSecondary": "[1, 1, 1, 1]",
+                    "pivot": {
+                      "translation": "[0, 0]",
+                      "rotation": 0,
+                      "scaling": "[1, 1]"
+                    },
+                    "Component": {
+                      "active": true
+                    },
+                    "idMaterial": "Material|2021-11-23T13:57:10.829Z|20863"
+                  }
+                }
+              ]
+            },
+            "children": []
+          }
+        },
+        {
+          "ƒ.Node": {
+            "name": "Kart",
+            "components": {
+              "ComponentMesh": [
+                {
+                  "ƒ.ComponentMesh": {
+                    "idMesh": "MeshCube|2021-11-23T14:04:12.890Z|66201",
+                    "pivot": {
+                      "translation": "[0, 1, 0]",
+                      "rotation": "[0, 0, 0]",
+                      "scaling": "[2, 0.5, 1]"
+                    },
+                    "Component": {
+                      "active": true
+                    }
+                  }
+                }
+              ],
+              "ComponentMaterial": [
+                {
+                  "ƒ.ComponentMaterial": {
+                    "sortForAlpha": false,
+                    "clrPrimary": "[1, 1, 1, 1]",
+                    "clrSecondary": "[1, 1, 1, 1]",
+                    "pivot": {
+                      "translation": "[0, 0]",
+                      "rotation": 0,
+                      "scaling": "[1, 1]"
+                    },
+                    "Component": {
+                      "active": true
+                    },
+                    "idMaterial": "Material|2021-11-23T14:04:24.432Z|09277"
+                  }
+                }
+              ],
+              "ComponentLight": [],
+              "ComponentTransform": [
+                {
+                  "ƒ.ComponentTransform": {
+                    "local": {
+                      "translation": "[0, 0, 0]",
+                      "rotation": "[0, 0, 0]",
+                      "scaling": "[1, 1, 1]"
+                    },
+                    "Component": {
+                      "active": true
+                    }
+                  }
+                }
+              ]
+            },
+            "children": []
+          }
+        }
+      ],
+      "idResource": "Graph|2021-11-23T13:53:15.504Z|06927",
+      "type": "Graph"
+    }
+  },
+  "MeshRelief|2021-11-23T13:53:30.668Z|19102": {
+    "ƒ.MeshRelief": {
+      "idResource": "MeshRelief|2021-11-23T13:53:30.668Z|19102",
+      "name": "MeshRelief",
+      "type": "MeshRelief"
+    }
+  },
+  "TextureImage|2021-11-23T13:55:02.489Z|94006": {
+    "ƒ.TextureImage": {
+      "url": "assets\\map.png",
+      "type": "TextureImage",
+      "Texture": {
+        "idResource": "TextureImage|2021-11-23T13:55:02.489Z|94006",
+        "name": "assets\\map.png",
+        "mipmap": "CRISP"
+      }
+    }
+  },
+  "Material|2021-11-23T13:57:10.829Z|20863": {
+    "ƒ.Material": {
+      "name": "NewMaterial",
+      "idResource": "Material|2021-11-23T13:57:10.829Z|20863",
+      "shader": "ShaderTextureFlat",
+      "coat": {
+        "ƒ.CoatTextured": {
+          "color": "[1, 1, 1, 1]",
+          "idTexture": "TextureImage|2021-11-23T13:57:22.117Z|56212"
+        }
+      }
+    }
+  },
+  "TextureImage|2021-11-23T13:57:22.117Z|56212": {
+    "ƒ.TextureImage": {
+      "url": "assets\\maptex.png",
+      "type": "TextureImage",
+      "Texture": {
+        "idResource": "TextureImage|2021-11-23T13:57:22.117Z|56212",
+        "name": "assets\\maptex.png",
+        "mipmap": "CRISP"
+      }
+    }
+  },
+  "MeshCube|2021-11-23T14:04:12.890Z|66201": {
+    "ƒ.MeshCube": {
+      "idResource": "MeshCube|2021-11-23T14:04:12.890Z|66201",
+      "name": "MeshCube",
+      "type": "MeshCube"
+    }
+  },
+  "Material|2021-11-23T14:04:24.432Z|09277": {
+    "ƒ.Material": {
+      "name": "Kart",
+      "idResource": "Material|2021-11-23T14:04:24.432Z|09277",
+      "shader": "ShaderFlat",
+      "coat": {
+        "ƒ.CoatColored": {
+          "color": "[1, 0, 0, 1]"
+        }
+      }
+    }
+  }
+}
