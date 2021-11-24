@@ -9,8 +9,8 @@ var Script;
         // Properties may be mutated by users in the editor via the automatically created user interface
         message = "AgentComponentScript added to ";
         agentCanMove = true;
-        agentStartPosition = new f.Vector3(0, 0, 1);
-        agentMaxMovementSpeed = 20.0;
+        agentStartPosition = new f.Vector3(0, 0, 0);
+        agentMaxMovementSpeed = 70.0;
         agentMaxTurnSpeed = 90;
         agentControlForward;
         agentControlTurn;
@@ -19,7 +19,8 @@ var Script;
             super();
             this.agentControlForward = new f.Control("Forward", 1, 0 /* PROPORTIONAL */);
             this.agentControlTurn = new f.Control("Turn", 1, 0 /* PROPORTIONAL */);
-            this.agentControlForward.setDelay(500);
+            this.agentControlForward.setDelay(1000);
+            this.agentControlTurn.setDelay(250);
             // Don't start when running in editor
             if (f.Project.mode == f.MODE.EDITOR)
                 return;
@@ -32,13 +33,18 @@ var Script;
             f.Loop.addEventListener("loopFrame" /* LOOP_FRAME */, this.update);
         };
         update = (_event) => {
-            let forwardValue = (f.Keyboard.mapToValue(-1, 0, [f.KEYBOARD_CODE.ARROW_DOWN, f.KEYBOARD_CODE.S]) + f.Keyboard.mapToValue(1, 0, [f.KEYBOARD_CODE.ARROW_UP, f.KEYBOARD_CODE.W]));
+            let forwardValue = (f.Keyboard.mapToValue(-0.25, 0, [f.KEYBOARD_CODE.ARROW_DOWN, f.KEYBOARD_CODE.S]) + f.Keyboard.mapToValue(1, 0, [f.KEYBOARD_CODE.ARROW_UP, f.KEYBOARD_CODE.W]));
             let turnValue = (f.Keyboard.mapToValue(-1, 0, [f.KEYBOARD_CODE.ARROW_RIGHT, f.KEYBOARD_CODE.D]) + f.Keyboard.mapToValue(1, 0, [f.KEYBOARD_CODE.ARROW_LEFT, f.KEYBOARD_CODE.A]));
             if (this.agentCanMove) {
                 this.agentControlForward.setInput(forwardValue);
                 this.agentControlTurn.setInput(turnValue);
-                this.agentTransform.rotateY(this.agentControlTurn.getOutput() * this.agentMaxTurnSpeed * f.Loop.timeFrameReal / 1000);
-                this.agentTransform.translateX(this.agentControlForward.getOutput() * this.agentMaxMovementSpeed * f.Loop.timeFrameReal / 1000);
+                if (this.agentControlForward.getOutput() > 0.01) {
+                    this.agentTransform.rotateY((this.agentControlTurn.getOutput() * (1.5 - this.agentControlForward.getOutput())) * this.agentMaxTurnSpeed * f.Loop.timeFrameReal / 1000);
+                }
+                if (this.agentControlForward.getOutput() < -0.01) {
+                    this.agentTransform.rotateY((this.agentControlTurn.getOutput() * (this.agentControlForward.getOutput() - 0.5)) * this.agentMaxTurnSpeed * f.Loop.timeFrameReal / 1000);
+                }
+                this.agentTransform.translateZ(this.agentControlForward.getOutput() * this.agentMaxMovementSpeed * f.Loop.timeFrameReal / 1000);
             }
         };
         respawn = () => {
@@ -109,24 +115,80 @@ var Script;
     var f = FudgeCore;
     f.Debug.info("Main Program Template running!");
     let viewport;
-    let meshTerrain;
-    document.addEventListener("interactiveViewportStarted", start);
-    function start(_event) {
-        viewport = _event.detail;
-        let graph = viewport.getBranch();
-        let kart = graph.getChildrenByName("Kart")[0];
+    let graph;
+    let cameraNode;
+    let meshRelief;
+    let mtxRelief;
+    let kart;
+    //let meshTerrain: f.MeshTerrain;
+    window.addEventListener("load", init);
+    // show dialog for startup
+    let dialog;
+    function init(_event) {
+        dialog = document.querySelector("dialog");
+        dialog.querySelector("h1").textContent = document.title;
+        dialog.addEventListener("click", function (_event) {
+            // @ts-ignore until HTMLDialog is implemented by all browsers and available in dom.d.ts
+            dialog.close();
+            setupCamera().then(() => {
+                start();
+            });
+        });
+        //@ts-ignore
+        dialog.showModal();
+    }
+    async function setupCamera() {
+        let _graphId = document.head.querySelector("meta[autoView]").getAttribute("autoView");
+        await f.Project.loadResourcesFromHTML();
+        graph = f.Project.resources[_graphId];
+        if (!graph) {
+            alert("Nothing to render. Create a graph with at least a mesh, material and probably some light");
+            return;
+        }
+        // setup the viewport
+        cameraNode = new f.Node("Camera");
+        let cmpCamera = new f.ComponentCamera();
+        cameraNode.addComponent(cmpCamera);
+        let canvas = document.querySelector("canvas");
+        viewport = new f.Viewport();
+        viewport.initialize("Viewport", graph, cmpCamera, canvas);
+        // setup audio
+        let cmpListener = new f.ComponentAudioListener();
+        cameraNode.addComponent(cmpListener);
+        cameraNode.addComponent(new f.ComponentTransform());
+        f.AudioManager.default.listenWith(cmpListener);
+        f.AudioManager.default.listenTo(graph);
+        f.Debug.log("Audio:", f.AudioManager.default);
+        // draw viewport once for immediate feedback
+        viewport.draw();
+    }
+    // setup and start interactive viewport
+    function start() {
+        kart = graph.getChildrenByName("Kart")[0];
         kart.addComponent(new Script.AgentComponentScript);
-        let cmpTerrain = graph.getChildrenByName("Terrain")[0].getComponent(f.MeshTerrain);
-        meshTerrain = cmpTerrain.mesh;
+        kart.addChild(cameraNode);
         console.log(kart);
+        let terrain = graph.getChildrenByName("Terrain")[0].getComponent(f.ComponentMesh);
+        meshRelief = terrain.mesh;
+        mtxRelief = terrain.mtxWorld;
+        console.log(kart.getComponent(Script.AgentComponentScript).agentStartPosition);
+        cameraNode.getComponent(f.ComponentTransform).mtxLocal.mutate({
+            translation: new f.Vector3(0, 2, -10),
+        });
         f.Loop.addEventListener("loopFrame" /* LOOP_FRAME */, update);
         f.Loop.start(f.LOOP_MODE.TIME_REAL, 60); // start the game loop to continously draw the viewport, update the audiosystem and drive the physics i/a
         //f.Loop.addEventListener(f.EVENT.LOOP_FRAME, update);
         // f.Loop.start();  // start the game loop to continously draw the viewport, update the audiosystem and drive the physics i/a
     }
+    function showKartToTerrain() {
+        let terrainInfo = meshRelief.getTerrainInfo(kart.mtxLocal.translation, mtxRelief);
+        kart.mtxLocal.translation = terrainInfo.position;
+        kart.mtxLocal.showTo(f.Vector3.SUM(terrainInfo.position, kart.mtxLocal.getZ()), terrainInfo.normal);
+    }
     function update(_event) {
         // f.Physics.world.simulate();  // if physics is included and used
         viewport.draw();
+        showKartToTerrain();
         f.AudioManager.default.update();
     }
 })(Script || (Script = {}));
