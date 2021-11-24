@@ -173,7 +173,8 @@ var Script;
         mtxRelief = terrain.mtxWorld;
         console.log(kart.getComponent(Script.AgentComponentScript).agentStartPosition);
         cameraNode.getComponent(f.ComponentTransform).mtxLocal.mutate({
-            translation: new f.Vector3(0, 2, -10),
+            translation: new f.Vector3(0, 4, -15),
+            rotation: new f.Vector3(10, 0, 0),
         });
         f.Loop.addEventListener("loopFrame" /* LOOP_FRAME */, update);
         f.Loop.start(f.LOOP_MODE.TIME_REAL, 60); // start the game loop to continously draw the viewport, update the audiosystem and drive the physics i/a
