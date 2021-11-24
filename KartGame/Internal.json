@@ -69,6 +69,17 @@
       "idTexture": "TextureImage|2021-11-24T21:21:07.637Z|57121"
     }
   },
+  "TextureImage|2021-11-24T21:21:07.637Z|57121": {
+    "ƒ.TextureImage": {
+      "url": "assets\\map2.png",
+      "type": "TextureImage",
+      "Texture": {
+        "idResource": "TextureImage|2021-11-24T21:21:07.637Z|57121",
+        "name": "assets\\map2.png",
+        "mipmap": "CRISP"
+      }
+    }
+  },
   "Material|2021-11-24T21:22:25.237Z|44774": {
     "ƒ.Material": {
       "name": "NewMaterial",
@@ -93,6 +104,13 @@
       }
     }
   },
+  "MeshRelief|2021-11-24T22:16:09.513Z|57876": {
+    "ƒ.MeshRelief": {
+      "idResource": "MeshRelief|2021-11-24T22:16:09.513Z|57876",
+      "name": "MeshRelief",
+      "type": "MeshRelief"
+    }
+  },
   "Graph|2021-11-23T13:53:15.504Z|06927": {
     "ƒ.Graph": {
       "name": "Scene",
@@ -105,11 +123,11 @@
               "ComponentMesh": [
                 {
                   "ƒ.ComponentMesh": {
-                    "idMesh": "MeshRelief|2021-11-24T21:21:02.666Z|65290",
+                    "idMesh": "MeshRelief|2021-11-24T22:16:09.513Z|57876",
                     "pivot": {
                       "translation": "[0, 0, 0]",
                       "rotation": "[0, 0, 0]",
-                      "scaling": "[500, 50, 500]"
+                      "scaling": "[500, 20, 500]"
                     },
                     "Component": {
                       "active": true
@@ -210,7 +228,7 @@
                 {
                   "ƒ.ComponentTransform": {
                     "local": {
-                      "translation": "[-230, 27, 0]",
+                      "translation": "[-230, 11, 0]",
                       "rotation": "[0, 0, 0]",
                       "scaling": "[1, 1, 1]"
                     },
@@ -229,13 +247,13 @@
       "type": "Graph"
     }
   },
-  "TextureImage|2021-11-24T21:21:07.637Z|57121": {
+  "TextureImage|2021-11-24T22:16:13.999Z|41117": {
     "ƒ.TextureImage": {
-      "url": "assets\\map2.png",
+      "url": "assets\\map4.png",
       "type": "TextureImage",
       "Texture": {
-        "idResource": "TextureImage|2021-11-24T21:21:07.637Z|57121",
-        "name": "assets\\map2.png",
+        "idResource": "TextureImage|2021-11-24T22:16:13.999Z|41117",
+        "name": "assets\\map4.png",
         "mipmap": "CRISP"
       }
     }
