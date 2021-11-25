@@ -50,8 +50,9 @@ namespace Script {
       if(this.agentCanMove) {
         this.agentControlForward.setInput(forwardValue);
         this.agentControlTurn.setInput(turnValue);
+      }
 
-        if(this.agentControlForward.getOutput() > 0.01) {
+      if(this.agentControlForward.getOutput() > 0.01) {
           this.agentTransform.rotateY((this.agentControlTurn.getOutput() * ( 1.5 - this.agentControlForward.getOutput())) * this.agentMaxTurnSpeed * f.Loop.timeFrameReal / 1000);
         }
 
@@ -60,7 +61,6 @@ namespace Script {
         }
         
         this.agentTransform.translateZ(this.agentControlForward.getOutput() * this.agentMaxMovementSpeed * f.Loop.timeFrameReal / 1000);
-      }
     }
 
 

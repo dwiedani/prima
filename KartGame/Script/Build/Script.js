@@ -38,14 +38,14 @@ var Script;
             if (this.agentCanMove) {
                 this.agentControlForward.setInput(forwardValue);
                 this.agentControlTurn.setInput(turnValue);
-                if (this.agentControlForward.getOutput() > 0.01) {
-                    this.agentTransform.rotateY((this.agentControlTurn.getOutput() * (1.5 - this.agentControlForward.getOutput())) * this.agentMaxTurnSpeed * f.Loop.timeFrameReal / 1000);
-                }
-                if (this.agentControlForward.getOutput() < -0.01) {
-                    this.agentTransform.rotateY((this.agentControlTurn.getOutput() * (this.agentControlForward.getOutput() - 0.5)) * this.agentMaxTurnSpeed * f.Loop.timeFrameReal / 1000);
-                }
-                this.agentTransform.translateZ(this.agentControlForward.getOutput() * this.agentMaxMovementSpeed * f.Loop.timeFrameReal / 1000);
             }
+            if (this.agentControlForward.getOutput() > 0.01) {
+                this.agentTransform.rotateY((this.agentControlTurn.getOutput() * (1.5 - this.agentControlForward.getOutput())) * this.agentMaxTurnSpeed * f.Loop.timeFrameReal / 1000);
+            }
+            if (this.agentControlForward.getOutput() < -0.01) {
+                this.agentTransform.rotateY((this.agentControlTurn.getOutput() * (this.agentControlForward.getOutput() - 0.5)) * this.agentMaxTurnSpeed * f.Loop.timeFrameReal / 1000);
+            }
+            this.agentTransform.translateZ(this.agentControlForward.getOutput() * this.agentMaxMovementSpeed * f.Loop.timeFrameReal / 1000);
         };
         respawn = () => {
             this.agentTransform.mutate({
@@ -167,11 +167,9 @@ var Script;
         kart = graph.getChildrenByName("Kart")[0];
         kart.addComponent(new Script.AgentComponentScript);
         graph.addChild(cameraNode);
-        console.log(kart);
         let terrain = graph.getChildrenByName("Terrain")[0].getComponent(f.ComponentMesh);
         meshRelief = terrain.mesh;
         mtxRelief = terrain.mtxWorld;
-        console.log(kart.getComponent(Script.AgentComponentScript).agentStartPosition);
         cameraNode.getComponent(f.ComponentCamera).mtxPivot.mutate({
             translation: new f.Vector3(0, 4, -15),
             rotation: new f.Vector3(10, 0, 0),
@@ -186,7 +184,7 @@ var Script;
         kart.mtxLocal.translation = terrainInfo.position;
         kart.mtxLocal.showTo(f.Vector3.SUM(terrainInfo.position, kart.mtxLocal.getZ()), terrainInfo.normal);
     }
-    function placeCameraOnKart() {
+    function adjustCameraToKart() {
         cameraNode.mtxLocal.mutate({
             translation: kart.mtxLocal.translation,
             rotation: new f.Vector3(0, kart.mtxLocal.rotation.y, 0),
@@ -196,7 +194,7 @@ var Script;
         // f.Physics.world.simulate();  // if physics is included and used
         viewport.draw();
         showKartToTerrain();
-        placeCameraOnKart();
+        adjustCameraToKart();
         f.AudioManager.default.update();
     }
 })(Script || (Script = {}));

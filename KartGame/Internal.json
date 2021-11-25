@@ -127,7 +127,7 @@
                     "pivot": {
                       "translation": "[0, 0, 0]",
                       "rotation": "[0, 0, 0]",
-                      "scaling": "[500, 20, 500]"
+                      "scaling": "[500, 1, 500]"
                     },
                     "Component": {
                       "active": true
