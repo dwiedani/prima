@@ -69,7 +69,7 @@ namespace Script {
   function start():void {
     kart = graph.getChildrenByName("Kart")[0];
     kart.addComponent(new AgentComponentScript);
-    kart.addChild(cameraNode);
+    graph.addChild(cameraNode);
     console.log(kart);
 
     let terrain: f.ComponentMesh = graph.getChildrenByName("Terrain")[0].getComponent( f.ComponentMesh );
@@ -78,7 +78,7 @@ namespace Script {
 
     console.log(kart.getComponent(AgentComponentScript).agentStartPosition);
     
-    cameraNode.getComponent(f.ComponentTransform).mtxLocal.mutate(
+    cameraNode.getComponent(f.ComponentCamera).mtxPivot.mutate(
       {
         translation: new f.Vector3(0,4,-15),
         rotation: new f.Vector3(10,0,0),
@@ -96,10 +96,18 @@ namespace Script {
     kart.mtxLocal.showTo(f.Vector3.SUM(terrainInfo.position, kart.mtxLocal.getZ()), terrainInfo.normal);
   }
 
+  function placeCameraOnKart():void {
+    cameraNode.mtxLocal.mutate({
+      translation: kart.mtxLocal.translation,
+      rotation: new f.Vector3(0,kart.mtxLocal.rotation.y,0),
+    });
+  }
+
   function update(_event: Event): void {
     // f.Physics.world.simulate();  // if physics is included and used
     viewport.draw();
     showKartToTerrain();
+    placeCameraOnKart();
     f.AudioManager.default.update();
   }
 }

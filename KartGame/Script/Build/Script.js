@@ -166,13 +166,13 @@ var Script;
     function start() {
         kart = graph.getChildrenByName("Kart")[0];
         kart.addComponent(new Script.AgentComponentScript);
-        kart.addChild(cameraNode);
+        graph.addChild(cameraNode);
         console.log(kart);
         let terrain = graph.getChildrenByName("Terrain")[0].getComponent(f.ComponentMesh);
         meshRelief = terrain.mesh;
         mtxRelief = terrain.mtxWorld;
         console.log(kart.getComponent(Script.AgentComponentScript).agentStartPosition);
-        cameraNode.getComponent(f.ComponentTransform).mtxLocal.mutate({
+        cameraNode.getComponent(f.ComponentCamera).mtxPivot.mutate({
             translation: new f.Vector3(0, 4, -15),
             rotation: new f.Vector3(10, 0, 0),
         });
@@ -186,10 +186,17 @@ var Script;
         kart.mtxLocal.translation = terrainInfo.position;
         kart.mtxLocal.showTo(f.Vector3.SUM(terrainInfo.position, kart.mtxLocal.getZ()), terrainInfo.normal);
     }
+    function placeCameraOnKart() {
+        cameraNode.mtxLocal.mutate({
+            translation: kart.mtxLocal.translation,
+            rotation: new f.Vector3(0, kart.mtxLocal.rotation.y, 0),
+        });
+    }
     function update(_event) {
         // f.Physics.world.simulate();  // if physics is included and used
         viewport.draw();
         showKartToTerrain();
+        placeCameraOnKart();
         f.AudioManager.default.update();
     }
 })(Script || (Script = {}));
