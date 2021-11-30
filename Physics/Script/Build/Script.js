@@ -37,14 +37,30 @@ var Script;
     var f = FudgeCore;
     f.Debug.info("Main Program Template running!");
     let viewport;
+    let agentControlForward = new f.Control("Forward", 10, 0 /* PROPORTIONAL */);
+    let agentControlTurn = new f.Control("Turn", 5, 0 /* PROPORTIONAL */);
+    let agent;
+    let agentBody;
     document.addEventListener("interactiveViewportStarted", start);
     function start(_event) {
         viewport = _event.detail;
+        let graph = viewport.getBranch();
+        agentControlForward.setDelay(10);
+        agentControlTurn.setDelay(10);
+        agent = graph.getChildrenByName("agent")[0];
+        agentBody = agent.getComponent(f.ComponentRigidbody);
         f.Loop.addEventListener("loopFrame" /* LOOP_FRAME */, update);
         f.Loop.start(); // start the game loop to continously draw the viewport, update the audiosystem and drive the physics i/a
     }
     function update(_event) {
         f.Physics.world.simulate(); // if physics is included and used
+        let turn = f.Keyboard.mapToTrit([f.KEYBOARD_CODE.ARROW_LEFT, f.KEYBOARD_CODE.A], [f.KEYBOARD_CODE.ARROW_RIGHT, f.KEYBOARD_CODE.D]);
+        agentControlTurn.setInput(turn);
+        agentBody.applyTorque(f.Vector3.SCALE(f.Vector3.Y(), agentControlTurn.getOutput()));
+        console.log(agentControlTurn.getOutput());
+        let forward = f.Keyboard.mapToTrit([f.KEYBOARD_CODE.ARROW_DOWN, f.KEYBOARD_CODE.S], [f.KEYBOARD_CODE.ARROW_UP, f.KEYBOARD_CODE.W]);
+        agentControlForward.setInput(forward);
+        agentBody.applyForce(f.Vector3.SCALE(agent.mtxLocal.getZ(), agentControlForward.getOutput()));
         viewport.draw();
         f.AudioManager.default.update();
     }
