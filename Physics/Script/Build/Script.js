@@ -41,7 +41,7 @@ var Script;
     function start(_event) {
         viewport = _event.detail;
         f.Loop.addEventListener("loopFrame" /* LOOP_FRAME */, update);
-        // f.Loop.start();  // start the game loop to continously draw the viewport, update the audiosystem and drive the physics i/a
+        f.Loop.start(); // start the game loop to continously draw the viewport, update the audiosystem and drive the physics i/a
     }
     function update(_event) {
         f.Physics.world.simulate(); // if physics is included and used
