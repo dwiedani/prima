@@ -4,7 +4,7 @@ namespace Script {
 
   let viewport: f.Viewport;
   let agentControlForward: f.Control = new f.Control("Forward", 10, f.CONTROL_TYPE.PROPORTIONAL);
-  let agentControlTurn: f.Control = new f.Control("Turn", 5, f.CONTROL_TYPE.PROPORTIONAL);
+  let agentControlTurn: f.Control = new f.Control("Turn", 1, f.CONTROL_TYPE.PROPORTIONAL);
   let agent: f.Node;
   let agentBody: f.ComponentRigidbody;
 
@@ -13,7 +13,7 @@ namespace Script {
   function start(_event: CustomEvent): void {
     viewport = _event.detail;
     let graph = viewport.getBranch();
-    agentControlForward.setDelay(10);
+    agentControlForward.setDelay(50);
     agentControlTurn.setDelay(10);
 
     agent = graph.getChildrenByName("agent")[0];

@@ -38,14 +38,14 @@ var Script;
     f.Debug.info("Main Program Template running!");
     let viewport;
     let agentControlForward = new f.Control("Forward", 10, 0 /* PROPORTIONAL */);
-    let agentControlTurn = new f.Control("Turn", 5, 0 /* PROPORTIONAL */);
+    let agentControlTurn = new f.Control("Turn", 1, 0 /* PROPORTIONAL */);
     let agent;
     let agentBody;
     document.addEventListener("interactiveViewportStarted", start);
     function start(_event) {
         viewport = _event.detail;
         let graph = viewport.getBranch();
-        agentControlForward.setDelay(10);
+        agentControlForward.setDelay(50);
         agentControlTurn.setDelay(10);
         agent = graph.getChildrenByName("agent")[0];
         agentBody = agent.getComponent(f.ComponentRigidbody);
