@@ -10,6 +10,7 @@ declare namespace Script {
         agentControlForward: f.Control;
         agentControlTurn: f.Control;
         agentTransform: f.Matrix4x4;
+        agentBody: f.ComponentRigidbody;
         constructor();
         create: () => void;
         update: (_event: Event) => void;

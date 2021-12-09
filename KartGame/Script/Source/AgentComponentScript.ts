@@ -14,13 +14,14 @@ namespace Script {
     public agentControlForward: f.Control;
     public agentControlTurn: f.Control;
     public agentTransform: f.Matrix4x4;
+    public agentBody: f.ComponentRigidbody;
 
     constructor() {
       super();
       this.agentControlForward = new f.Control("Forward", 1, f.CONTROL_TYPE.PROPORTIONAL);
       this.agentControlTurn = new f.Control("Turn", 1, f.CONTROL_TYPE.PROPORTIONAL);
-      this.agentControlForward.setDelay(1000);
-      this.agentControlTurn.setDelay(250);
+      this.agentControlForward.setDelay(50);
+      this.agentControlTurn.setDelay(10);
 
       // Don't start when running in editor
       if (f.Project.mode == f.MODE.EDITOR)
@@ -34,33 +35,23 @@ namespace Script {
 
     public create = () => {
       this.agentTransform = this.node.getComponent(f.ComponentTransform).mtxLocal;
+      this.agentBody = this.node.getComponent(f.ComponentRigidbody);
       f.Loop.addEventListener(f.EVENT.LOOP_FRAME, this.update);
     }
 
 
     public update = (_event: Event) => {
-      let forwardValue: number = (
-        f.Keyboard.mapToValue(-0.25, 0, [f.KEYBOARD_CODE.ARROW_DOWN, f.KEYBOARD_CODE.S]) + f.Keyboard.mapToValue(1, 0, [f.KEYBOARD_CODE.ARROW_UP, f.KEYBOARD_CODE.W])
-      );
-  
-      let turnValue: number = (
-        f.Keyboard.mapToValue(-1, 0, [f.KEYBOARD_CODE.ARROW_RIGHT,f.KEYBOARD_CODE.D]) + f.Keyboard.mapToValue(1, 0, [f.KEYBOARD_CODE.ARROW_LEFT,f.KEYBOARD_CODE.A])
-      );
-
+      let forwardValue: number = f.Keyboard.mapToTrit([f.KEYBOARD_CODE.ARROW_DOWN, f.KEYBOARD_CODE.S], [f.KEYBOARD_CODE.ARROW_UP, f.KEYBOARD_CODE.W]);
+      let turnValue: number = f.Keyboard.mapToTrit([f.KEYBOARD_CODE.ARROW_LEFT, f.KEYBOARD_CODE.A], [f.KEYBOARD_CODE.ARROW_RIGHT, f.KEYBOARD_CODE.D]);
+      
       if(this.agentCanMove) {
         this.agentControlForward.setInput(forwardValue);
         this.agentControlTurn.setInput(turnValue);
       }
 
-      if(this.agentControlForward.getOutput() > 0.01) {
-          this.agentTransform.rotateY((this.agentControlTurn.getOutput() * ( 1.5 - this.agentControlForward.getOutput())) * this.agentMaxTurnSpeed * f.Loop.timeFrameReal / 1000);
-        }
-
-        if(this.agentControlForward.getOutput() < -0.01) {
-          this.agentTransform.rotateY((this.agentControlTurn.getOutput() * (this.agentControlForward.getOutput() - 0.5)) * this.agentMaxTurnSpeed * f.Loop.timeFrameReal / 1000);
-        }
+      this.agentBody.applyTorque(f.Vector3.SCALE(f.Vector3.Y(), this.agentControlTurn.getOutput()));         
+      this.agentBody.applyForce(f.Vector3.SCALE(this.node.mtxLocal.getZ(), this.agentControlForward.getOutput()));
         
-        this.agentTransform.translateZ(this.agentControlForward.getOutput() * this.agentMaxMovementSpeed * f.Loop.timeFrameReal / 1000);
     }
 
 

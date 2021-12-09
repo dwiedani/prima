@@ -15,12 +15,13 @@ var Script;
         agentControlForward;
         agentControlTurn;
         agentTransform;
+        agentBody;
         constructor() {
             super();
             this.agentControlForward = new f.Control("Forward", 1, 0 /* PROPORTIONAL */);
             this.agentControlTurn = new f.Control("Turn", 1, 0 /* PROPORTIONAL */);
-            this.agentControlForward.setDelay(1000);
-            this.agentControlTurn.setDelay(250);
+            this.agentControlForward.setDelay(50);
+            this.agentControlTurn.setDelay(10);
             // Don't start when running in editor
             if (f.Project.mode == f.MODE.EDITOR)
                 return;
@@ -30,22 +31,18 @@ var Script;
         }
         create = () => {
             this.agentTransform = this.node.getComponent(f.ComponentTransform).mtxLocal;
+            this.agentBody = this.node.getComponent(f.ComponentRigidbody);
             f.Loop.addEventListener("loopFrame" /* LOOP_FRAME */, this.update);
         };
         update = (_event) => {
-            let forwardValue = (f.Keyboard.mapToValue(-0.25, 0, [f.KEYBOARD_CODE.ARROW_DOWN, f.KEYBOARD_CODE.S]) + f.Keyboard.mapToValue(1, 0, [f.KEYBOARD_CODE.ARROW_UP, f.KEYBOARD_CODE.W]));
-            let turnValue = (f.Keyboard.mapToValue(-1, 0, [f.KEYBOARD_CODE.ARROW_RIGHT, f.KEYBOARD_CODE.D]) + f.Keyboard.mapToValue(1, 0, [f.KEYBOARD_CODE.ARROW_LEFT, f.KEYBOARD_CODE.A]));
+            let forwardValue = f.Keyboard.mapToTrit([f.KEYBOARD_CODE.ARROW_DOWN, f.KEYBOARD_CODE.S], [f.KEYBOARD_CODE.ARROW_UP, f.KEYBOARD_CODE.W]);
+            let turnValue = f.Keyboard.mapToTrit([f.KEYBOARD_CODE.ARROW_LEFT, f.KEYBOARD_CODE.A], [f.KEYBOARD_CODE.ARROW_RIGHT, f.KEYBOARD_CODE.D]);
             if (this.agentCanMove) {
                 this.agentControlForward.setInput(forwardValue);
                 this.agentControlTurn.setInput(turnValue);
             }
-            if (this.agentControlForward.getOutput() > 0.01) {
-                this.agentTransform.rotateY((this.agentControlTurn.getOutput() * (1.5 - this.agentControlForward.getOutput())) * this.agentMaxTurnSpeed * f.Loop.timeFrameReal / 1000);
-            }
-            if (this.agentControlForward.getOutput() < -0.01) {
-                this.agentTransform.rotateY((this.agentControlTurn.getOutput() * (this.agentControlForward.getOutput() - 0.5)) * this.agentMaxTurnSpeed * f.Loop.timeFrameReal / 1000);
-            }
-            this.agentTransform.translateZ(this.agentControlForward.getOutput() * this.agentMaxMovementSpeed * f.Loop.timeFrameReal / 1000);
+            this.agentBody.applyTorque(f.Vector3.SCALE(f.Vector3.Y(), this.agentControlTurn.getOutput()));
+            this.agentBody.applyForce(f.Vector3.SCALE(this.node.mtxLocal.getZ(), this.agentControlForward.getOutput()));
         };
         respawn = () => {
             this.agentTransform.mutate({
@@ -117,10 +114,17 @@ var Script;
     let viewport;
     let graph;
     let cameraNode;
-    let meshRelief;
-    let mtxRelief;
-    let kart;
-    //let meshTerrain: f.MeshTerrain;
+    let mtxTerrain;
+    let meshTerrain;
+    let cart;
+    let body;
+    let isGrounded = false;
+    let dampTranslation;
+    let dampRotation;
+    let ctrForward = new f.Control("Forward", 35000, 0 /* PROPORTIONAL */);
+    ctrForward.setDelay(200);
+    let ctrTurn = new f.Control("Turn", 500, 0 /* PROPORTIONAL */);
+    ctrTurn.setDelay(50);
     window.addEventListener("load", init);
     // show dialog for startup
     let dialog;
@@ -164,12 +168,16 @@ var Script;
     }
     // setup and start interactive viewport
     function start() {
-        kart = graph.getChildrenByName("Kart")[0];
-        kart.addComponent(new Script.AgentComponentScript);
+        cart = graph.getChildrenByName("Kart")[0];
+        //cart.addComponent(new AgentComponentScript);
+        body = cart.getComponent(f.ComponentRigidbody);
         graph.addChild(cameraNode);
+        dampTranslation = body.dampTranslation;
+        dampRotation = body.dampRotation;
         let terrain = graph.getChildrenByName("Terrain")[0].getComponent(f.ComponentMesh);
-        meshRelief = terrain.mesh;
-        mtxRelief = terrain.mtxWorld;
+        meshTerrain = terrain.mesh;
+        //meshTerrain = <f.MeshRelief>terrain.mesh;
+        mtxTerrain = terrain.mtxWorld;
         cameraNode.getComponent(f.ComponentCamera).mtxPivot.mutate({
             translation: new f.Vector3(0, 4, -15),
             rotation: new f.Vector3(10, 0, 0),
@@ -177,24 +185,53 @@ var Script;
         f.Loop.addEventListener("loopFrame" /* LOOP_FRAME */, update);
         f.Loop.start(f.LOOP_MODE.TIME_REAL, 60); // start the game loop to continously draw the viewport, update the audiosystem and drive the physics i/a
         //f.Loop.addEventListener(f.EVENT.LOOP_FRAME, update);
-        // f.Loop.start();  // start the game loop to continously draw the viewport, update the audiosystem and drive the physics i/a
+        //f.Loop.start();  // start the game loop to continously draw the viewport, update the audiosystem and drive the physics i/a
     }
-    function showKartToTerrain() {
-        let terrainInfo = meshRelief.getTerrainInfo(kart.mtxLocal.translation, mtxRelief);
-        kart.mtxLocal.translation = terrainInfo.position;
-        kart.mtxLocal.showTo(f.Vector3.SUM(terrainInfo.position, kart.mtxLocal.getZ()), terrainInfo.normal);
-    }
-    function adjustCameraToKart() {
+    //function showcartToTerrain():void {
+    //  let terrainInfo: f.TerrainInfo = meshTerrain.getTerrainInfo(cart.mtxLocal.translation, mtxTerrain);
+    //  cart.mtxLocal.translation = terrainInfo.position;
+    //  cart.mtxLocal.showTo(f.Vector3.SUM(terrainInfo.position, cart.mtxLocal.getZ()), terrainInfo.normal);
+    //}
+    function adjustCameraTocart() {
         cameraNode.mtxLocal.mutate({
-            translation: kart.mtxLocal.translation,
-            rotation: new f.Vector3(0, kart.mtxLocal.rotation.y, 0),
+            translation: cart.mtxLocal.translation,
+            rotation: new f.Vector3(0, cart.mtxLocal.rotation.y, 0),
         });
     }
+    function cartControls() {
+        let maxHeight = 0.3;
+        let minHeight = 0.2;
+        let forceNodes = cart.getChildren();
+        let force = f.Vector3.SCALE(f.Physics.world.getGravity(), -body.mass / forceNodes.length);
+        isGrounded = false;
+        for (let forceNode of forceNodes) {
+            let posForce = forceNode.getComponent(f.ComponentMesh).mtxWorld.translation;
+            let terrainInfo = meshTerrain.getTerrainInfo(posForce, mtxTerrain);
+            let height = posForce.y - terrainInfo.position.y;
+            if (height < maxHeight) {
+                body.applyForceAtPoint(f.Vector3.SCALE(force, (maxHeight - height) / (maxHeight - minHeight)), posForce);
+                isGrounded = true;
+            }
+        }
+        if (isGrounded) {
+            body.dampTranslation = dampTranslation;
+            body.dampRotation = dampRotation;
+            let turn = f.Keyboard.mapToTrit([f.KEYBOARD_CODE.A, f.KEYBOARD_CODE.ARROW_LEFT], [f.KEYBOARD_CODE.D, f.KEYBOARD_CODE.ARROW_RIGHT]);
+            ctrTurn.setInput(turn);
+            body.applyTorque(f.Vector3.SCALE(cart.mtxLocal.getY(), ctrTurn.getOutput()));
+            let forward = f.Keyboard.mapToTrit([f.KEYBOARD_CODE.W, f.KEYBOARD_CODE.ARROW_UP], [f.KEYBOARD_CODE.S, f.KEYBOARD_CODE.ARROW_DOWN]);
+            ctrForward.setInput(forward);
+            body.applyForce(f.Vector3.SCALE(cart.mtxLocal.getZ(), ctrForward.getOutput()));
+        }
+        else
+            body.dampRotation = body.dampTranslation = 0;
+    }
     function update(_event) {
-        // f.Physics.world.simulate();  // if physics is included and used
+        f.Physics.world.simulate(); // if physics is included and used
         viewport.draw();
-        showKartToTerrain();
-        adjustCameraToKart();
+        //showcartToTerrain();
+        cartControls();
+        adjustCameraTocart();
         f.AudioManager.default.update();
     }
 })(Script || (Script = {}));

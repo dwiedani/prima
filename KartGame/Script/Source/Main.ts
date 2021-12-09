@@ -5,11 +5,18 @@ namespace Script {
   let viewport: f.Viewport;
   let graph: f.Graph;
   let cameraNode: f.Node;
-  let meshRelief: f.MeshRelief;
-  let mtxRelief: f.Matrix4x4;
-  let kart: f.Node;
+  let mtxTerrain: f.Matrix4x4;
+  let meshTerrain: f.MeshTerrain;
+  let cart: f.Node;
+  let body: f.ComponentRigidbody;
+  let isGrounded: boolean = false;
+  let dampTranslation: number;
+  let dampRotation: number;
 
-  //let meshTerrain: f.MeshTerrain;
+  let ctrForward: f.Control = new f.Control("Forward", 35000, f.CONTROL_TYPE.PROPORTIONAL);
+  ctrForward.setDelay(200);
+  let ctrTurn: f.Control = new f.Control("Turn", 500, f.CONTROL_TYPE.PROPORTIONAL);
+  ctrTurn.setDelay(50);
 
   window.addEventListener("load", init);
 
@@ -67,14 +74,18 @@ namespace Script {
 
   // setup and start interactive viewport
   function start():void {
-    kart = graph.getChildrenByName("Kart")[0];
-    kart.addComponent(new AgentComponentScript);
+    cart = graph.getChildrenByName("Kart")[0];
+    //cart.addComponent(new AgentComponentScript);
+    body = cart.getComponent(f.ComponentRigidbody);
     graph.addChild(cameraNode);
+    dampTranslation = body.dampTranslation;
+    dampRotation = body.dampRotation;
 
 
-    let terrain: f.ComponentMesh = graph.getChildrenByName("Terrain")[0].getComponent( f.ComponentMesh );
-    meshRelief = <f.MeshRelief>terrain.mesh;
-    mtxRelief = terrain.mtxWorld;
+    let terrain = graph.getChildrenByName("Terrain")[0].getComponent( f.ComponentMesh );
+    meshTerrain = <f.MeshTerrain>terrain.mesh;
+    //meshTerrain = <f.MeshRelief>terrain.mesh;
+    mtxTerrain = terrain.mtxWorld;
     
     cameraNode.getComponent(f.ComponentCamera).mtxPivot.mutate(
       {
@@ -85,27 +96,62 @@ namespace Script {
     f.Loop.addEventListener(f.EVENT.LOOP_FRAME, update);
     f.Loop.start(f.LOOP_MODE.TIME_REAL, 60);  // start the game loop to continously draw the viewport, update the audiosystem and drive the physics i/a
     //f.Loop.addEventListener(f.EVENT.LOOP_FRAME, update);
-    // f.Loop.start();  // start the game loop to continously draw the viewport, update the audiosystem and drive the physics i/a
+    //f.Loop.start();  // start the game loop to continously draw the viewport, update the audiosystem and drive the physics i/a
   }  
 
-  function showKartToTerrain():void {
-    let terrainInfo: f.TerrainInfo = meshRelief.getTerrainInfo(kart.mtxLocal.translation, mtxRelief);
-    kart.mtxLocal.translation = terrainInfo.position;
-    kart.mtxLocal.showTo(f.Vector3.SUM(terrainInfo.position, kart.mtxLocal.getZ()), terrainInfo.normal);
-  }
+  //function showcartToTerrain():void {
+  //  let terrainInfo: f.TerrainInfo = meshTerrain.getTerrainInfo(cart.mtxLocal.translation, mtxTerrain);
+  //  cart.mtxLocal.translation = terrainInfo.position;
+  //  cart.mtxLocal.showTo(f.Vector3.SUM(terrainInfo.position, cart.mtxLocal.getZ()), terrainInfo.normal);
+  //}
 
-  function adjustCameraToKart():void {
+  function adjustCameraTocart():void {
     cameraNode.mtxLocal.mutate({
-      translation: kart.mtxLocal.translation,
-      rotation: new f.Vector3(0,kart.mtxLocal.rotation.y,0),
+      translation: cart.mtxLocal.translation,
+      rotation: new f.Vector3(0,cart.mtxLocal.rotation.y,0),
     });
   }
 
+  function cartControls():void {
+   
+    let maxHeight: number = 0.3;
+    let minHeight: number = 0.2;
+    let forceNodes: f.Node[] = cart.getChildren();
+    let force: f.Vector3 = f.Vector3.SCALE(f.Physics.world.getGravity(), -body.mass / forceNodes.length);
+
+    isGrounded = false;
+    for (let forceNode of forceNodes) {
+      let posForce: f.Vector3 = forceNode.getComponent(f.ComponentMesh).mtxWorld.translation;
+      let terrainInfo: f.TerrainInfo = meshTerrain.getTerrainInfo(posForce, mtxTerrain);
+      let height: number = posForce.y - terrainInfo.position.y;
+
+      if (height < maxHeight) {
+        body.applyForceAtPoint(f.Vector3.SCALE(force, (maxHeight - height) / (maxHeight - minHeight)), posForce);
+        isGrounded = true;
+      }
+    }
+
+    if (isGrounded) {
+      body.dampTranslation = dampTranslation;
+      body.dampRotation = dampRotation;
+      let turn: number = f.Keyboard.mapToTrit([f.KEYBOARD_CODE.A, f.KEYBOARD_CODE.ARROW_LEFT], [f.KEYBOARD_CODE.D, f.KEYBOARD_CODE.ARROW_RIGHT]);
+      ctrTurn.setInput(turn);
+      body.applyTorque(f.Vector3.SCALE(cart.mtxLocal.getY(), ctrTurn.getOutput()));
+
+      let forward: number = f.Keyboard.mapToTrit([f.KEYBOARD_CODE.W, f.KEYBOARD_CODE.ARROW_UP], [f.KEYBOARD_CODE.S, f.KEYBOARD_CODE.ARROW_DOWN]);
+      ctrForward.setInput(forward);
+      body.applyForce(f.Vector3.SCALE(cart.mtxLocal.getZ(), ctrForward.getOutput()));
+    }
+    else
+      body.dampRotation = body.dampTranslation = 0;
+  }
+
   function update(_event: Event): void {
-    // f.Physics.world.simulate();  // if physics is included and used
+    f.Physics.world.simulate();  // if physics is included and used
     viewport.draw();
-    showKartToTerrain();
-    adjustCameraToKart();
+    //showcartToTerrain();
+    cartControls();
+    adjustCameraTocart();
     f.AudioManager.default.update();
   }
 }
