@@ -133,7 +133,6 @@ namespace Script {
     let color:any = context.getImageData(x, y, 1, 1);
     if(color.data[0] < 150 && color.data[1] < 150 && color.data[2] < 150) {
       cartOffroadDrag.setInput(1);
-      console.log(cartOffroadDrag);
     } else {
       cartOffroadDrag.setInput(0.25);
     }
@@ -142,8 +141,8 @@ namespace Script {
 
   function cartControls():void {
    
-    let maxHeight: number = 0.3;
-    let minHeight: number = 0.1;
+    let maxHeight: number = 0.5;
+    let minHeight: number = 0.25;
     let forceNodes: f.Node[] = cart.getChildren();
     let force: f.Vector3 = f.Vector3.SCALE(f.Physics.world.getGravity(), -body.mass / forceNodes.length);
 

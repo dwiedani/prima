@@ -217,15 +217,14 @@ var Script;
         let color = context.getImageData(x, y, 1, 1);
         if (color.data[0] < 150 && color.data[1] < 150 && color.data[2] < 150) {
             cartOffroadDrag.setInput(1);
-            console.log(cartOffroadDrag);
         }
         else {
             cartOffroadDrag.setInput(0.25);
         }
     }
     function cartControls() {
-        let maxHeight = 0.3;
-        let minHeight = 0.1;
+        let maxHeight = 0.5;
+        let minHeight = 0.25;
         let forceNodes = cart.getChildren();
         let force = f.Vector3.SCALE(f.Physics.world.getGravity(), -body.mass / forceNodes.length);
         isGrounded = false;
