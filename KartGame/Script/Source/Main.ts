@@ -6,6 +6,8 @@ namespace Script {
   let graph: f.Graph;
   let cameraNode: f.Node;
   let mtxTerrain: f.Matrix4x4;
+  let cartMaxSpeed: number = 100000;
+  let cartMaxTurnSpeed: number = 300;
   let meshTerrain: f.MeshTerrain;
   let cart: f.Node;
   let body: f.ComponentRigidbody;
@@ -13,10 +15,10 @@ namespace Script {
   let dampTranslation: number;
   let dampRotation: number;
 
-  let ctrForward: f.Control = new f.Control("Forward", 35000, f.CONTROL_TYPE.PROPORTIONAL);
-  ctrForward.setDelay(200);
-  let ctrTurn: f.Control = new f.Control("Turn", 500, f.CONTROL_TYPE.PROPORTIONAL);
-  ctrTurn.setDelay(50);
+  let ctrForward: f.Control = new f.Control("Forward", 1, f.CONTROL_TYPE.PROPORTIONAL);
+  ctrForward.setDelay(1000);
+  let ctrTurn: f.Control = new f.Control("Turn", 1, f.CONTROL_TYPE.PROPORTIONAL);
+  ctrTurn.setDelay(500);
 
   window.addEventListener("load", init);
 
@@ -105,7 +107,7 @@ namespace Script {
   //  cart.mtxLocal.showTo(f.Vector3.SUM(terrainInfo.position, cart.mtxLocal.getZ()), terrainInfo.normal);
   //}
 
-  function adjustCameraTocart():void {
+  function adjustCameraToCart():void {
     cameraNode.mtxLocal.mutate({
       translation: cart.mtxLocal.translation,
       rotation: new f.Vector3(0,cart.mtxLocal.rotation.y,0),
@@ -115,7 +117,7 @@ namespace Script {
   function cartControls():void {
    
     let maxHeight: number = 0.3;
-    let minHeight: number = 0.2;
+    let minHeight: number = 0.1;
     let forceNodes: f.Node[] = cart.getChildren();
     let force: f.Vector3 = f.Vector3.SCALE(f.Physics.world.getGravity(), -body.mass / forceNodes.length);
 
@@ -136,11 +138,11 @@ namespace Script {
       body.dampRotation = dampRotation;
       let turn: number = f.Keyboard.mapToTrit([f.KEYBOARD_CODE.A, f.KEYBOARD_CODE.ARROW_LEFT], [f.KEYBOARD_CODE.D, f.KEYBOARD_CODE.ARROW_RIGHT]);
       ctrTurn.setInput(turn);
-      body.applyTorque(f.Vector3.SCALE(cart.mtxLocal.getY(), ctrTurn.getOutput()));
+      body.applyTorque(f.Vector3.SCALE(cart.mtxLocal.getY(), ctrTurn.getOutput()*cartMaxTurnSpeed));
 
       let forward: number = f.Keyboard.mapToTrit([f.KEYBOARD_CODE.W, f.KEYBOARD_CODE.ARROW_UP], [f.KEYBOARD_CODE.S, f.KEYBOARD_CODE.ARROW_DOWN]);
       ctrForward.setInput(forward);
-      body.applyForce(f.Vector3.SCALE(cart.mtxLocal.getZ(), ctrForward.getOutput()));
+      body.applyForce(f.Vector3.SCALE(cart.mtxLocal.getZ(), ctrForward.getOutput()*cartMaxSpeed));
     }
     else
       body.dampRotation = body.dampTranslation = 0;
@@ -151,7 +153,7 @@ namespace Script {
     viewport.draw();
     //showcartToTerrain();
     cartControls();
-    adjustCameraTocart();
+    adjustCameraToCart();
     f.AudioManager.default.update();
   }
 }

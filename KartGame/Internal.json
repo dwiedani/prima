@@ -261,10 +261,10 @@
                 {
                   "ƒ.ComponentRigidbody": {
                     "initialization": "TO_MESH",
-                    "friction": 0.2,
+                    "friction": 0,
                     "restitution": 0.2,
                     "mass": 100,
-                    "dampTranslation": 5,
+                    "dampTranslation": 10,
                     "dampRotation": 100,
                     "effectGravity": 1,
                     "typeBody": "DYNAMIC",
@@ -272,9 +272,9 @@
                     "isTrigger": false,
                     "id": 0,
                     "pivot": {
-                      "translation": "[0, 0.24999959766864777, 0]",
+                      "translation": "[0, 0, 0]",
                       "rotation": "[0, 0, 0]",
-                      "scaling": "[1, 0.5, 2]"
+                      "scaling": "[1, 1, 1]"
                     },
                     "Component": {
                       "active": true

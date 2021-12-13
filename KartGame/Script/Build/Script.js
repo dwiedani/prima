@@ -115,16 +115,18 @@ var Script;
     let graph;
     let cameraNode;
     let mtxTerrain;
+    let cartMaxSpeed = 100000;
+    let cartMaxTurnSpeed = 300;
     let meshTerrain;
     let cart;
     let body;
     let isGrounded = false;
     let dampTranslation;
     let dampRotation;
-    let ctrForward = new f.Control("Forward", 35000, 0 /* PROPORTIONAL */);
-    ctrForward.setDelay(200);
-    let ctrTurn = new f.Control("Turn", 500, 0 /* PROPORTIONAL */);
-    ctrTurn.setDelay(50);
+    let ctrForward = new f.Control("Forward", 1, 0 /* PROPORTIONAL */);
+    ctrForward.setDelay(1000);
+    let ctrTurn = new f.Control("Turn", 1, 0 /* PROPORTIONAL */);
+    ctrTurn.setDelay(500);
     window.addEventListener("load", init);
     // show dialog for startup
     let dialog;
@@ -192,7 +194,7 @@ var Script;
     //  cart.mtxLocal.translation = terrainInfo.position;
     //  cart.mtxLocal.showTo(f.Vector3.SUM(terrainInfo.position, cart.mtxLocal.getZ()), terrainInfo.normal);
     //}
-    function adjustCameraTocart() {
+    function adjustCameraToCart() {
         cameraNode.mtxLocal.mutate({
             translation: cart.mtxLocal.translation,
             rotation: new f.Vector3(0, cart.mtxLocal.rotation.y, 0),
@@ -200,7 +202,7 @@ var Script;
     }
     function cartControls() {
         let maxHeight = 0.3;
-        let minHeight = 0.2;
+        let minHeight = 0.1;
         let forceNodes = cart.getChildren();
         let force = f.Vector3.SCALE(f.Physics.world.getGravity(), -body.mass / forceNodes.length);
         isGrounded = false;
@@ -218,10 +220,10 @@ var Script;
             body.dampRotation = dampRotation;
             let turn = f.Keyboard.mapToTrit([f.KEYBOARD_CODE.A, f.KEYBOARD_CODE.ARROW_LEFT], [f.KEYBOARD_CODE.D, f.KEYBOARD_CODE.ARROW_RIGHT]);
             ctrTurn.setInput(turn);
-            body.applyTorque(f.Vector3.SCALE(cart.mtxLocal.getY(), ctrTurn.getOutput()));
+            body.applyTorque(f.Vector3.SCALE(cart.mtxLocal.getY(), ctrTurn.getOutput() * cartMaxTurnSpeed));
             let forward = f.Keyboard.mapToTrit([f.KEYBOARD_CODE.W, f.KEYBOARD_CODE.ARROW_UP], [f.KEYBOARD_CODE.S, f.KEYBOARD_CODE.ARROW_DOWN]);
             ctrForward.setInput(forward);
-            body.applyForce(f.Vector3.SCALE(cart.mtxLocal.getZ(), ctrForward.getOutput()));
+            body.applyForce(f.Vector3.SCALE(cart.mtxLocal.getZ(), ctrForward.getOutput() * cartMaxSpeed));
         }
         else
             body.dampRotation = body.dampTranslation = 0;
@@ -231,7 +233,7 @@ var Script;
         viewport.draw();
         //showcartToTerrain();
         cartControls();
-        adjustCameraTocart();
+        adjustCameraToCart();
         f.AudioManager.default.update();
     }
 })(Script || (Script = {}));
