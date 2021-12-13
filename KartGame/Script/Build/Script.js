@@ -223,8 +223,8 @@ var Script;
         }
     }
     function cartControls() {
-        let maxHeight = 0.5;
-        let minHeight = 0.25;
+        let maxHeight = 1;
+        let minHeight = 0.75;
         let forceNodes = cart.getChildren();
         let force = f.Vector3.SCALE(f.Physics.world.getGravity(), -body.mass / forceNodes.length);
         isGrounded = false;

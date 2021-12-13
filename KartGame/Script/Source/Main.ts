@@ -141,8 +141,8 @@ namespace Script {
 
   function cartControls():void {
    
-    let maxHeight: number = 0.5;
-    let minHeight: number = 0.25;
+    let maxHeight: number = 1;
+    let minHeight: number = 0.75;
     let forceNodes: f.Node[] = cart.getChildren();
     let force: f.Vector3 = f.Vector3.SCALE(f.Physics.world.getGravity(), -body.mass / forceNodes.length);
 

@@ -280,7 +280,7 @@
                     "pivot": {
                       "translation": "[0, 0.24999959766864777, 0]",
                       "rotation": "[0, 0, 0]",
-                      "scaling": "[1, 0.5, 2]"
+                      "scaling": "[1, 1, 1]"
                     },
                     "Component": {
                       "active": true
