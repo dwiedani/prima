@@ -117,6 +117,7 @@ var Script;
     let mtxTerrain;
     let cartMaxSpeed = 100000;
     let cartMaxTurnSpeed = 300;
+    let cartOffroadDrag = 0;
     let meshTerrain;
     let cart;
     let body;
@@ -200,6 +201,26 @@ var Script;
             rotation: new f.Vector3(0, cart.mtxLocal.rotation.y, 0),
         });
     }
+    function cartOffroad() {
+        let terrainInfo = meshTerrain.getTerrainInfo(cart.mtxWorld.translation, mtxTerrain);
+        let canvas = document.createElement('canvas');
+        let context = canvas.getContext('2d');
+        let img = new Image(1000, 1000);
+        img.src = './assets/maptex.png';
+        canvas.width = img.width;
+        canvas.height = img.height;
+        context.drawImage(img, 0, 0);
+        let x = Math.floor(terrainInfo.position.x);
+        let y = Math.floor(terrainInfo.position.z);
+        let color = context.getImageData(x, y, 1, 1);
+        if (color.data[0] < 150 && color.data[1] < 150 && color.data[2] < 150) {
+            cartOffroadDrag = 1;
+            console.log(cartOffroadDrag);
+        }
+        else {
+            cartOffroadDrag = 0.25;
+        }
+    }
     function cartControls() {
         let maxHeight = 0.3;
         let minHeight = 0.1;
@@ -223,7 +244,7 @@ var Script;
             body.applyTorque(f.Vector3.SCALE(cart.mtxLocal.getY(), ctrTurn.getOutput() * cartMaxTurnSpeed));
             let forward = f.Keyboard.mapToTrit([f.KEYBOARD_CODE.W, f.KEYBOARD_CODE.ARROW_UP], [f.KEYBOARD_CODE.S, f.KEYBOARD_CODE.ARROW_DOWN]);
             ctrForward.setInput(forward);
-            body.applyForce(f.Vector3.SCALE(cart.mtxLocal.getZ(), ctrForward.getOutput() * cartMaxSpeed));
+            body.applyForce(f.Vector3.SCALE(cart.mtxLocal.getZ(), ctrForward.getOutput() * (cartMaxSpeed * cartOffroadDrag)));
         }
         else
             body.dampRotation = body.dampTranslation = 0;
@@ -233,6 +254,7 @@ var Script;
         viewport.draw();
         //showcartToTerrain();
         cartControls();
+        cartOffroad();
         adjustCameraToCart();
         f.AudioManager.default.update();
     }

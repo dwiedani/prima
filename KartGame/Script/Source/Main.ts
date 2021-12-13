@@ -8,6 +8,7 @@ namespace Script {
   let mtxTerrain: f.Matrix4x4;
   let cartMaxSpeed: number = 100000;
   let cartMaxTurnSpeed: number = 300;
+  let cartOffroadDrag: number = 0;
   let meshTerrain: f.MeshTerrain;
   let cart: f.Node;
   let body: f.ComponentRigidbody;
@@ -114,6 +115,28 @@ namespace Script {
     });
   }
 
+  function cartOffroad():void {
+    let terrainInfo: f.TerrainInfo = meshTerrain.getTerrainInfo(cart.mtxWorld.translation, mtxTerrain);
+    let canvas = document.createElement('canvas');
+    let context = canvas.getContext('2d');
+    let img = new Image(1000,1000);
+    img.src = './assets/maptex.png';
+    canvas.width = img.width;
+    canvas.height = img.height;
+    context.drawImage(img, 0, 0 );
+    
+    let x: number = Math.floor(terrainInfo.position.x);
+    let y: number = Math.floor(terrainInfo.position.z);
+    let color:any = context.getImageData(x, y, 1, 1);
+    if(color.data[0] < 150 && color.data[1] < 150 && color.data[2] < 150) {
+      cartOffroadDrag = 1;
+      console.log(cartOffroadDrag);
+    } else {
+      cartOffroadDrag = 0.25;
+    }
+    
+  }
+
   function cartControls():void {
    
     let maxHeight: number = 0.3;
@@ -142,7 +165,7 @@ namespace Script {
 
       let forward: number = f.Keyboard.mapToTrit([f.KEYBOARD_CODE.W, f.KEYBOARD_CODE.ARROW_UP], [f.KEYBOARD_CODE.S, f.KEYBOARD_CODE.ARROW_DOWN]);
       ctrForward.setInput(forward);
-      body.applyForce(f.Vector3.SCALE(cart.mtxLocal.getZ(), ctrForward.getOutput()*cartMaxSpeed));
+      body.applyForce(f.Vector3.SCALE(cart.mtxLocal.getZ(), ctrForward.getOutput() * (cartMaxSpeed * cartOffroadDrag));
     }
     else
       body.dampRotation = body.dampTranslation = 0;
@@ -153,6 +176,7 @@ namespace Script {
     viewport.draw();
     //showcartToTerrain();
     cartControls();
+    cartOffroad();
     adjustCameraToCart();
     f.AudioManager.default.update();
   }
