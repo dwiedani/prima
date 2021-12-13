@@ -165,7 +165,7 @@ namespace Script {
 
       let forward: number = f.Keyboard.mapToTrit([f.KEYBOARD_CODE.W, f.KEYBOARD_CODE.ARROW_UP], [f.KEYBOARD_CODE.S, f.KEYBOARD_CODE.ARROW_DOWN]);
       ctrForward.setInput(forward);
-      body.applyForce(f.Vector3.SCALE(cart.mtxLocal.getZ(), ctrForward.getOutput() * (cartMaxSpeed * cartOffroadDrag));
+      body.applyForce(f.Vector3.SCALE(cart.mtxLocal.getZ(), ctrForward.getOutput() * (cartMaxSpeed * cartOffroadDrag)));
     }
     else
       body.dampRotation = body.dampTranslation = 0;
