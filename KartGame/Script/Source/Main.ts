@@ -8,7 +8,7 @@ namespace Script {
   let mtxTerrain: f.Matrix4x4;
   let cartMaxSpeed: number = 100000;
   let cartMaxTurnSpeed: number = 300;
-  let cartOffroadDrag: number = 0;
+  //let cartOffroadDrag: number = 0;
   let meshTerrain: f.MeshTerrain;
   let cart: f.Node;
   let body: f.ComponentRigidbody;
@@ -20,6 +20,9 @@ namespace Script {
   ctrForward.setDelay(1000);
   let ctrTurn: f.Control = new f.Control("Turn", 1, f.CONTROL_TYPE.PROPORTIONAL);
   ctrTurn.setDelay(500);
+
+  let cartOffroadDrag: f.Control = new f.Control("Drag", 1, f.CONTROL_TYPE.PROPORTIONAL);
+  cartOffroadDrag.setDelay(1000);
 
   window.addEventListener("load", init);
 
@@ -129,10 +132,10 @@ namespace Script {
     let y: number = Math.floor(terrainInfo.position.z);
     let color:any = context.getImageData(x, y, 1, 1);
     if(color.data[0] < 150 && color.data[1] < 150 && color.data[2] < 150) {
-      cartOffroadDrag = 1;
+      cartOffroadDrag.setInput(1);
       console.log(cartOffroadDrag);
     } else {
-      cartOffroadDrag = 0.25;
+      cartOffroadDrag.setInput(0.25);
     }
     
   }
@@ -165,7 +168,7 @@ namespace Script {
 
       let forward: number = f.Keyboard.mapToTrit([f.KEYBOARD_CODE.W, f.KEYBOARD_CODE.ARROW_UP], [f.KEYBOARD_CODE.S, f.KEYBOARD_CODE.ARROW_DOWN]);
       ctrForward.setInput(forward);
-      body.applyForce(f.Vector3.SCALE(cart.mtxLocal.getZ(), ctrForward.getOutput() * (cartMaxSpeed * cartOffroadDrag)));
+      body.applyForce(f.Vector3.SCALE(cart.mtxLocal.getZ(), ctrForward.getOutput() * (cartMaxSpeed * cartOffroadDrag.getOutput())));
     }
     else
       body.dampRotation = body.dampTranslation = 0;

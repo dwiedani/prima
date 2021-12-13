@@ -117,7 +117,7 @@ var Script;
     let mtxTerrain;
     let cartMaxSpeed = 100000;
     let cartMaxTurnSpeed = 300;
-    let cartOffroadDrag = 0;
+    //let cartOffroadDrag: number = 0;
     let meshTerrain;
     let cart;
     let body;
@@ -128,6 +128,8 @@ var Script;
     ctrForward.setDelay(1000);
     let ctrTurn = new f.Control("Turn", 1, 0 /* PROPORTIONAL */);
     ctrTurn.setDelay(500);
+    let cartOffroadDrag = new f.Control("Drag", 1, 0 /* PROPORTIONAL */);
+    cartOffroadDrag.setDelay(1000);
     window.addEventListener("load", init);
     // show dialog for startup
     let dialog;
@@ -214,11 +216,11 @@ var Script;
         let y = Math.floor(terrainInfo.position.z);
         let color = context.getImageData(x, y, 1, 1);
         if (color.data[0] < 150 && color.data[1] < 150 && color.data[2] < 150) {
-            cartOffroadDrag = 1;
+            cartOffroadDrag.setInput(1);
             console.log(cartOffroadDrag);
         }
         else {
-            cartOffroadDrag = 0.25;
+            cartOffroadDrag.setInput(0.25);
         }
     }
     function cartControls() {
@@ -244,7 +246,7 @@ var Script;
             body.applyTorque(f.Vector3.SCALE(cart.mtxLocal.getY(), ctrTurn.getOutput() * cartMaxTurnSpeed));
             let forward = f.Keyboard.mapToTrit([f.KEYBOARD_CODE.W, f.KEYBOARD_CODE.ARROW_UP], [f.KEYBOARD_CODE.S, f.KEYBOARD_CODE.ARROW_DOWN]);
             ctrForward.setInput(forward);
-            body.applyForce(f.Vector3.SCALE(cart.mtxLocal.getZ(), ctrForward.getOutput() * (cartMaxSpeed * cartOffroadDrag)));
+            body.applyForce(f.Vector3.SCALE(cart.mtxLocal.getZ(), ctrForward.getOutput() * (cartMaxSpeed * cartOffroadDrag.getOutput())));
         }
         else
             body.dampRotation = body.dampTranslation = 0;
