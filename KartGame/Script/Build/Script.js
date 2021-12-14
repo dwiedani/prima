@@ -124,6 +124,7 @@ var Script;
     let isGrounded = false;
     let dampTranslation;
     let dampRotation;
+    let context;
     let ctrForward = new f.Control("Forward", 1, 0 /* PROPORTIONAL */);
     ctrForward.setDelay(1000);
     let ctrTurn = new f.Control("Turn", 1, 0 /* PROPORTIONAL */);
@@ -187,33 +188,36 @@ var Script;
             translation: new f.Vector3(0, 4, -15),
             rotation: new f.Vector3(10, 0, 0),
         });
+        setupFrictionMap();
         f.Loop.addEventListener("loopFrame" /* LOOP_FRAME */, update);
         f.Loop.start(f.LOOP_MODE.TIME_REAL, 60); // start the game loop to continously draw the viewport, update the audiosystem and drive the physics i/a
         //f.Loop.addEventListener(f.EVENT.LOOP_FRAME, update);
         //f.Loop.start();  // start the game loop to continously draw the viewport, update the audiosystem and drive the physics i/a
     }
-    //function showcartToTerrain():void {
-    //  let terrainInfo: f.TerrainInfo = meshTerrain.getTerrainInfo(cart.mtxLocal.translation, mtxTerrain);
-    //  cart.mtxLocal.translation = terrainInfo.position;
-    //  cart.mtxLocal.showTo(f.Vector3.SUM(terrainInfo.position, cart.mtxLocal.getZ()), terrainInfo.normal);
-    //}
+    function showObjectToTerrain(object) {
+        let terrainInfo = meshTerrain.getTerrainInfo(object.mtxLocal.translation, mtxTerrain);
+        object.mtxLocal.translation = terrainInfo.position;
+        object.mtxLocal.showTo(f.Vector3.SUM(terrainInfo.position, object.mtxLocal.getZ()), terrainInfo.normal);
+    }
     function adjustCameraToCart() {
         cameraNode.mtxLocal.mutate({
             translation: cart.mtxLocal.translation,
             rotation: new f.Vector3(0, cart.mtxLocal.rotation.y, 0),
         });
     }
-    function cartOffroad() {
-        let terrainInfo = meshTerrain.getTerrainInfo(cart.mtxWorld.translation, mtxTerrain);
+    function setupFrictionMap() {
         let canvas = document.createElement('canvas');
-        let context = canvas.getContext('2d');
+        context = canvas.getContext('2d');
         let img = new Image(1000, 1000);
         img.src = './assets/maptex.png';
         canvas.width = img.width;
         canvas.height = img.height;
         context.drawImage(img, 0, 0);
-        let x = Math.floor(terrainInfo.position.x);
-        let y = Math.floor(terrainInfo.position.z);
+    }
+    function cartOffroad() {
+        let terrainInfo = meshTerrain.getTerrainInfo(cart.mtxWorld.translation, mtxTerrain);
+        let x = Math.floor(terrainInfo.position.x + mtxTerrain.scaling.x / 2);
+        let y = Math.floor(terrainInfo.position.z + mtxTerrain.scaling.z / 2);
         let color = context.getImageData(x, y, 1, 1);
         if (color.data[0] < 150 && color.data[1] < 150 && color.data[2] < 150) {
             cartOffroadDrag.setInput(1);
@@ -235,6 +239,12 @@ var Script;
             if (height < maxHeight) {
                 body.applyForceAtPoint(f.Vector3.SCALE(force, (maxHeight - height) / (maxHeight - minHeight)), posForce);
                 isGrounded = true;
+                showObjectToTerrain(forceNode);
+            }
+            else {
+                forceNode.mtxLocal.mutate({
+                    translation: new f.Vector3(0, 0, 0)
+                });
             }
         }
         if (isGrounded) {
@@ -247,13 +257,13 @@ var Script;
             ctrForward.setInput(forward);
             body.applyForce(f.Vector3.SCALE(cart.mtxLocal.getZ(), ctrForward.getOutput() * (cartMaxSpeed * cartOffroadDrag.getOutput())));
         }
-        else
+        else {
             body.dampRotation = body.dampTranslation = 0;
+        }
     }
     function update(_event) {
         f.Physics.world.simulate(); // if physics is included and used
         viewport.draw();
-        //showcartToTerrain();
         cartControls();
         cartOffroad();
         adjustCameraToCart();
