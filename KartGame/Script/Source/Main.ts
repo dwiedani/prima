@@ -30,7 +30,7 @@ namespace Script {
   cartOffroadDrag.setDelay(1000);
 
   let cartSuspension: f.Control = new f.Control("Suspension", 1, f.CONTROL_TYPE.PROPORTIONAL);
-  cartSuspension.setDelay(100);
+  cartSuspension.setDelay(50);
 
   window.addEventListener("load", init);
 
@@ -171,7 +171,9 @@ namespace Script {
     let x: number = Math.floor(terrainInfo.position.x + mtxTerrain.scaling.x/2);
     let y: number = Math.floor(terrainInfo.position.z + mtxTerrain.scaling.z/2);
     let color:any = dragMapContext.getImageData(x, y, 1, 1);
-    if(color.data[0] < 150 && color.data[1] < 150 && color.data[2] < 150) {
+    console.log(color.data[0]+color.data[1]+color.data[2]);
+    
+    if(color.data[0]+color.data[1]+color.data[2]<500) {
       cartOffroadDrag.setInput(1);
     } else {
       cartOffroadDrag.setInput(0.25);
@@ -199,7 +201,6 @@ namespace Script {
       } else {
         cartSuspension.setInput(0);
       }
-      console.log(cartSuspension.getOutput());
       
       forceNode.mtxLocal.mutate({
         translation: new f.Vector3(0,cartSuspension.getOutput(),0)
