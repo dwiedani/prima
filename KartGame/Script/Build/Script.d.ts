@@ -28,4 +28,16 @@ declare namespace Script {
     }
 }
 declare namespace Script {
+    import f = FudgeCore;
+    class GameState extends f.Mutable {
+        private static controller;
+        private static instance;
+        name: string;
+        health: number;
+        private constructor();
+        static get(): GameState;
+        protected reduceMutator(_mutator: f.Mutator): void;
+    }
+}
+declare namespace Script {
 }

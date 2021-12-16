@@ -14,3 +14,13 @@ canvas.fullscreen {
   width: 100vw; 
   height: 100vh; 
 }
+
+canvas.ui-map {
+  width: 250px;
+  height: 250px;
+  position: absolute;
+  bottom: 25px;
+  left: 25px;
+  background-color: #d8d8d8;
+
+}

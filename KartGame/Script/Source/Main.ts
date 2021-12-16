@@ -6,7 +6,7 @@ namespace Script {
   let graph: f.Graph;
   let cameraNode: f.Node;
   let mtxTerrain: f.Matrix4x4;
-  let cartMaxSpeed: number = 100000;
+  let cartMaxSpeed: number = 200000;
   let cartMaxTurnSpeed: number = 300;
   //let cartOffroadDrag: number = 0;
   let meshTerrain: f.MeshTerrain;
@@ -15,7 +15,11 @@ namespace Script {
   let isGrounded: boolean = false;
   let dampTranslation: number;
   let dampRotation: number;
-  let context: any;
+  let dragMapContext: any;
+  let miniMapContext: any;
+  let mapImg: any;
+  let mapWidth: number;
+  let mapHeight: number;
 
   let ctrForward: f.Control = new f.Control("Forward", 1, f.CONTROL_TYPE.PROPORTIONAL);
   ctrForward.setDelay(1000);
@@ -24,6 +28,9 @@ namespace Script {
 
   let cartOffroadDrag: f.Control = new f.Control("Drag", 1, f.CONTROL_TYPE.PROPORTIONAL);
   cartOffroadDrag.setDelay(1000);
+
+  let cartSuspension: f.Control = new f.Control("Suspension", 1, f.CONTROL_TYPE.PROPORTIONAL);
+  cartSuspension.setDelay(100);
 
   window.addEventListener("load", init);
 
@@ -102,17 +109,19 @@ namespace Script {
     );
 
     setupFrictionMap();
+    setupMiniMap();
+
     f.Loop.addEventListener(f.EVENT.LOOP_FRAME, update);
     f.Loop.start(f.LOOP_MODE.TIME_REAL, 60);  // start the game loop to continously draw the viewport, update the audiosystem and drive the physics i/a
     //f.Loop.addEventListener(f.EVENT.LOOP_FRAME, update);
     //f.Loop.start();  // start the game loop to continously draw the viewport, update the audiosystem and drive the physics i/a
   }  
 
-  function showObjectToTerrain(object: f.Node):void {
-    let terrainInfo: f.TerrainInfo = meshTerrain.getTerrainInfo(object.mtxLocal.translation, mtxTerrain);
-    object.mtxLocal.translation = terrainInfo.position;
-    object.mtxLocal.showTo(f.Vector3.SUM(terrainInfo.position, object.mtxLocal.getZ()), terrainInfo.normal);
-  }
+  //function showObjectToTerrain(object: f.Node):void {
+  //  let terrainInfo: f.TerrainInfo = meshTerrain.getTerrainInfo(object.mtxLocal.translation, mtxTerrain);
+  //  object.mtxLocal.translation = terrainInfo.position;
+  //  object.mtxLocal.showTo(f.Vector3.SUM(terrainInfo.position, object.mtxLocal.getZ()), terrainInfo.normal);
+  //}
 
   function adjustCameraToCart():void {
     cameraNode.mtxLocal.mutate({
@@ -123,29 +132,54 @@ namespace Script {
 
   function setupFrictionMap(){
     let canvas = document.createElement('canvas');
-    context = canvas.getContext('2d');
-    let img = new Image(1000,1000);
-    img.src = './assets/maptex.png';
-    canvas.width = img.width;
-    canvas.height = img.height;
-    context.drawImage(img, 0, 0 );
+    dragMapContext = canvas.getContext('2d');
+    mapImg = new Image(1000,1000);
+    mapImg.src = './assets/maptex.png';
+    canvas.width = mapImg.width;
+    canvas.height = mapImg.height;
+    dragMapContext.drawImage(mapImg, 0, 0,canvas.width,canvas.height );
+  }
+
+  function setupMiniMap(){
+    let canvas = <HTMLCanvasElement> document.getElementById('ui');
+    miniMapContext = canvas.getContext('2d');
+    canvas.width = mapImg.width;
+    canvas.height = mapImg.height;
+    mapWidth = mapImg.width;
+    mapHeight = mapImg.height;
+    updateMiniMap();
+  }
+
+  function updateMiniMap(){
+    miniMapContext.clearRect(0, 0, mapWidth, mapHeight);
+    //miniMapContext.filter = "grayscale(1)";
+    miniMapContext.globalAlpha = 0.7;
+    miniMapContext.drawImage(mapImg, 0, 0, mapWidth , mapHeight );
+    miniMapContext.globalAlpha = 1;
+    miniMapContext.filter = "none"; 
+  }
+
+  function drawPlayerOnMap(x: number, y: number){
+    updateMiniMap();
+    miniMapContext.globalAlpha = 1;
+    miniMapContext.fillStyle = "red";
+    miniMapContext.fillRect(x- 10,y-10,20,20);
   }
 
   function cartOffroad():void {
     let terrainInfo: f.TerrainInfo = meshTerrain.getTerrainInfo(cart.mtxWorld.translation, mtxTerrain);
     let x: number = Math.floor(terrainInfo.position.x + mtxTerrain.scaling.x/2);
     let y: number = Math.floor(terrainInfo.position.z + mtxTerrain.scaling.z/2);
-    let color:any = context.getImageData(x, y, 1, 1);
+    let color:any = dragMapContext.getImageData(x, y, 1, 1);
     if(color.data[0] < 150 && color.data[1] < 150 && color.data[2] < 150) {
       cartOffroadDrag.setInput(1);
     } else {
       cartOffroadDrag.setInput(0.25);
     }
-    
+    drawPlayerOnMap(x,y);
   }
 
   function cartControls():void {
-   
     let maxHeight: number = 1;
     let minHeight: number = 0.75;
     let forceNodes: f.Node[] = cart.getChildren();
@@ -160,12 +194,16 @@ namespace Script {
       if (height < maxHeight) {
         body.applyForceAtPoint(f.Vector3.SCALE(force, (maxHeight - height) / (maxHeight - minHeight)), posForce);
         isGrounded = true;
-        showObjectToTerrain(forceNode);
+        //showObjectToTerrain(forceNode);
+        cartSuspension.setInput(height*0.25);
       } else {
-        forceNode.mtxLocal.mutate({
-          translation: new f.Vector3(0,0,0)
-        })
+        cartSuspension.setInput(0);
       }
+      console.log(cartSuspension.getOutput());
+      
+      forceNode.mtxLocal.mutate({
+        translation: new f.Vector3(0,cartSuspension.getOutput(),0)
+      })
     }
 
     if (isGrounded) {
@@ -182,8 +220,6 @@ namespace Script {
     else {
       body.dampRotation = body.dampTranslation = 0;
     }
-      
-
   }
 
   function update(_event: Event): void {

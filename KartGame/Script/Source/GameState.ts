@@ -1,4 +1,4 @@
-namespace LaserLeague {
+namespace Script {
     import f = FudgeCore;
     import fui = FudgeUserInterface;
   
@@ -6,8 +6,7 @@ namespace LaserLeague {
       private static controller: fui.Controller;
       private static instance: GameState;
       public name: string = "LaserLeague";
-      public x: number;
-      public y: number;
+      public health: number = 100;
   
       private constructor() {
         super();

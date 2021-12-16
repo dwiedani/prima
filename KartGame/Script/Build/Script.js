@@ -110,12 +110,35 @@ var Script;
 var Script;
 (function (Script) {
     var f = FudgeCore;
+    var fui = FudgeUserInterface;
+    class GameState extends f.Mutable {
+        static controller;
+        static instance;
+        name = "LaserLeague";
+        health = 100;
+        constructor() {
+            super();
+            let domHud = document.querySelector("#ui");
+            GameState.instance = this;
+            GameState.controller = new fui.Controller(this, domHud);
+            console.log("Hud-Controller", GameState.controller);
+        }
+        static get() {
+            return GameState.instance || new GameState();
+        }
+        reduceMutator(_mutator) { }
+    }
+    Script.GameState = GameState;
+})(Script || (Script = {}));
+var Script;
+(function (Script) {
+    var f = FudgeCore;
     f.Debug.info("Main Program Template running!");
     let viewport;
     let graph;
     let cameraNode;
     let mtxTerrain;
-    let cartMaxSpeed = 100000;
+    let cartMaxSpeed = 200000;
     let cartMaxTurnSpeed = 300;
     //let cartOffroadDrag: number = 0;
     let meshTerrain;
@@ -124,13 +147,19 @@ var Script;
     let isGrounded = false;
     let dampTranslation;
     let dampRotation;
-    let context;
+    let dragMapContext;
+    let miniMapContext;
+    let mapImg;
+    let mapWidth;
+    let mapHeight;
     let ctrForward = new f.Control("Forward", 1, 0 /* PROPORTIONAL */);
     ctrForward.setDelay(1000);
     let ctrTurn = new f.Control("Turn", 1, 0 /* PROPORTIONAL */);
     ctrTurn.setDelay(500);
     let cartOffroadDrag = new f.Control("Drag", 1, 0 /* PROPORTIONAL */);
     cartOffroadDrag.setDelay(1000);
+    let cartSuspension = new f.Control("Suspension", 1, 0 /* PROPORTIONAL */);
+    cartSuspension.setDelay(100);
     window.addEventListener("load", init);
     // show dialog for startup
     let dialog;
@@ -189,16 +218,17 @@ var Script;
             rotation: new f.Vector3(10, 0, 0),
         });
         setupFrictionMap();
+        setupMiniMap();
         f.Loop.addEventListener("loopFrame" /* LOOP_FRAME */, update);
         f.Loop.start(f.LOOP_MODE.TIME_REAL, 60); // start the game loop to continously draw the viewport, update the audiosystem and drive the physics i/a
         //f.Loop.addEventListener(f.EVENT.LOOP_FRAME, update);
         //f.Loop.start();  // start the game loop to continously draw the viewport, update the audiosystem and drive the physics i/a
     }
-    function showObjectToTerrain(object) {
-        let terrainInfo = meshTerrain.getTerrainInfo(object.mtxLocal.translation, mtxTerrain);
-        object.mtxLocal.translation = terrainInfo.position;
-        object.mtxLocal.showTo(f.Vector3.SUM(terrainInfo.position, object.mtxLocal.getZ()), terrainInfo.normal);
-    }
+    //function showObjectToTerrain(object: f.Node):void {
+    //  let terrainInfo: f.TerrainInfo = meshTerrain.getTerrainInfo(object.mtxLocal.translation, mtxTerrain);
+    //  object.mtxLocal.translation = terrainInfo.position;
+    //  object.mtxLocal.showTo(f.Vector3.SUM(terrainInfo.position, object.mtxLocal.getZ()), terrainInfo.normal);
+    //}
     function adjustCameraToCart() {
         cameraNode.mtxLocal.mutate({
             translation: cart.mtxLocal.translation,
@@ -207,24 +237,48 @@ var Script;
     }
     function setupFrictionMap() {
         let canvas = document.createElement('canvas');
-        context = canvas.getContext('2d');
-        let img = new Image(1000, 1000);
-        img.src = './assets/maptex.png';
-        canvas.width = img.width;
-        canvas.height = img.height;
-        context.drawImage(img, 0, 0);
+        dragMapContext = canvas.getContext('2d');
+        mapImg = new Image(1000, 1000);
+        mapImg.src = './assets/maptex.png';
+        canvas.width = mapImg.width;
+        canvas.height = mapImg.height;
+        dragMapContext.drawImage(mapImg, 0, 0, canvas.width, canvas.height);
+    }
+    function setupMiniMap() {
+        let canvas = document.getElementById('ui');
+        miniMapContext = canvas.getContext('2d');
+        canvas.width = mapImg.width;
+        canvas.height = mapImg.height;
+        mapWidth = mapImg.width;
+        mapHeight = mapImg.height;
+        updateMiniMap();
+    }
+    function updateMiniMap() {
+        miniMapContext.clearRect(0, 0, mapWidth, mapHeight);
+        //miniMapContext.filter = "grayscale(1)";
+        miniMapContext.globalAlpha = 0.7;
+        miniMapContext.drawImage(mapImg, 0, 0, mapWidth, mapHeight);
+        miniMapContext.globalAlpha = 1;
+        miniMapContext.filter = "none";
+    }
+    function drawPlayerOnMap(x, y) {
+        updateMiniMap();
+        miniMapContext.globalAlpha = 1;
+        miniMapContext.fillStyle = "red";
+        miniMapContext.fillRect(x - 10, y - 10, 20, 20);
     }
     function cartOffroad() {
         let terrainInfo = meshTerrain.getTerrainInfo(cart.mtxWorld.translation, mtxTerrain);
         let x = Math.floor(terrainInfo.position.x + mtxTerrain.scaling.x / 2);
         let y = Math.floor(terrainInfo.position.z + mtxTerrain.scaling.z / 2);
-        let color = context.getImageData(x, y, 1, 1);
+        let color = dragMapContext.getImageData(x, y, 1, 1);
         if (color.data[0] < 150 && color.data[1] < 150 && color.data[2] < 150) {
             cartOffroadDrag.setInput(1);
         }
         else {
             cartOffroadDrag.setInput(0.25);
         }
+        drawPlayerOnMap(x, y);
     }
     function cartControls() {
         let maxHeight = 1;
@@ -239,13 +293,16 @@ var Script;
             if (height < maxHeight) {
                 body.applyForceAtPoint(f.Vector3.SCALE(force, (maxHeight - height) / (maxHeight - minHeight)), posForce);
                 isGrounded = true;
-                showObjectToTerrain(forceNode);
+                //showObjectToTerrain(forceNode);
+                cartSuspension.setInput(height * 0.25);
             }
             else {
-                forceNode.mtxLocal.mutate({
-                    translation: new f.Vector3(0, 0, 0)
-                });
+                cartSuspension.setInput(0);
             }
+            console.log(cartSuspension.getOutput());
+            forceNode.mtxLocal.mutate({
+                translation: new f.Vector3(0, cartSuspension.getOutput(), 0)
+            });
         }
         if (isGrounded) {
             body.dampTranslation = dampTranslation;
