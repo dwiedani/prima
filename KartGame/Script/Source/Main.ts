@@ -171,7 +171,6 @@ namespace Script {
     let x: number = Math.floor(terrainInfo.position.x + mtxTerrain.scaling.x/2);
     let y: number = Math.floor(terrainInfo.position.z + mtxTerrain.scaling.z/2);
     let color:any = dragMapContext.getImageData(x, y, 1, 1);
-    console.log(color.data[0]+color.data[1]+color.data[2]);
     
     if(color.data[0]+color.data[1]+color.data[2]<500) {
       cartOffroadDrag.setInput(1);
