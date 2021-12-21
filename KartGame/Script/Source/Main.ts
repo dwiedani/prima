@@ -212,7 +212,6 @@ namespace Script {
       let turn: number = f.Keyboard.mapToTrit([f.KEYBOARD_CODE.A, f.KEYBOARD_CODE.ARROW_LEFT], [f.KEYBOARD_CODE.D, f.KEYBOARD_CODE.ARROW_RIGHT]);
       ctrTurn.setInput(turn);
       body.applyTorque(f.Vector3.SCALE(cart.mtxLocal.getY(), ctrTurn.getOutput()*cartMaxTurnSpeed));
-
       let forward: number = f.Keyboard.mapToTrit([f.KEYBOARD_CODE.W, f.KEYBOARD_CODE.ARROW_UP], [f.KEYBOARD_CODE.S, f.KEYBOARD_CODE.ARROW_DOWN]);
       ctrForward.setInput(forward);
       body.applyForce(f.Vector3.SCALE(cart.mtxLocal.getZ(), ctrForward.getOutput() * (cartMaxSpeed * cartOffroadDrag.getOutput())));
@@ -228,6 +227,7 @@ namespace Script {
     cartControls();
     cartOffroad();
     adjustCameraToCart();
+    
     f.AudioManager.default.update();
   }
 }

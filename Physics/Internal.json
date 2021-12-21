@@ -118,7 +118,7 @@
                     "local": {
                       "translation": "[0, -1, 0]",
                       "rotation": "[0, 0, 0]",
-                      "scaling": "[5, 0.10000001639127731, 5]"
+                      "scaling": "[50, 0.10000001639127731, 50]"
                     },
                     "Component": {
                       "active": true
@@ -239,7 +239,7 @@
                     "dampRotation": 0.1,
                     "effectGravity": 2,
                     "typeBody": "DYNAMIC",
-                    "typeCollider": "CUBE",
+                    "typeCollider": "SPHERE",
                     "isTrigger": false,
                     "id": 1,
                     "pivot": {
@@ -256,7 +256,7 @@
               "ComponentMesh": [
                 {
                   "ƒ.ComponentMesh": {
-                    "idMesh": "MeshCube|2021-11-29T18:55:36.841Z|25009",
+                    "idMesh": "MeshSphere|2021-12-16T13:51:38.640Z|68468",
                     "pivot": {
                       "translation": "[0, 0, 0]",
                       "rotation": "[0, 0, 0]",
@@ -293,6 +293,15 @@
       ],
       "idResource": "Graph|2021-11-29T18:55:39.553Z|41143",
       "type": "Graph"
+    }
+  },
+  "MeshSphere|2021-12-16T13:51:38.640Z|68468": {
+    "ƒ.MeshSphere": {
+      "idResource": "MeshSphere|2021-12-16T13:51:38.640Z|68468",
+      "name": "MeshSphere",
+      "type": "MeshSphere",
+      "sectors": 8,
+      "stacks": 8
     }
   }
 }

@@ -1,0 +1,242 @@
+{
+  "MeshCube|2021-12-21T19:52:52.080Z|13369": {
+    "ƒ.MeshCube": {
+      "idResource": "MeshCube|2021-12-21T19:52:52.080Z|13369",
+      "name": "MeshCube",
+      "type": "MeshCube"
+    }
+  },
+  "Material|2021-12-21T19:54:28.273Z|84962": {
+    "ƒ.Material": {
+      "name": "RoadMaterial",
+      "idResource": "Material|2021-12-21T19:54:28.273Z|84962",
+      "shader": "ShaderTexture",
+      "coat": {
+        "ƒ.CoatTextured": {
+          "color": "[1, 1, 1, 1]"
+        }
+      }
+    }
+  },
+  "MeshQuad|2021-12-21T20:01:46.500Z|20384": {
+    "ƒ.MeshQuad": {
+      "idResource": "MeshQuad|2021-12-21T20:01:46.500Z|20384",
+      "name": "MeshPlane",
+      "type": "MeshQuad"
+    }
+  },
+  "Material|2021-12-21T20:03:44.136Z|55105": {
+    "ƒ.Material": {
+      "name": "Horrizon",
+      "idResource": "Material|2021-12-21T20:03:44.136Z|55105",
+      "shader": "ShaderTexture",
+      "coat": {
+        "ƒ.CoatTextured": {
+          "color": "[1, 1, 1, 1]"
+        }
+      }
+    }
+  },
+  "Graph|2021-12-21T19:52:16.317Z|25080": {
+    "ƒ.Graph": {
+      "name": "Scene",
+      "components": {
+        "ComponentLight": [
+          {
+            "ƒ.ComponentLight": {
+              "pivot": {
+                "translation": "[0, 0, 0]",
+                "rotation": "[0, 0, 0]",
+                "scaling": "[1, 1, 1]"
+              },
+              "light": {
+                "ƒ.LightAmbient": {
+                  "color": "[1, 1, 1, 1]"
+                }
+              }
+            }
+          }
+        ]
+      },
+      "children": [
+        {
+          "ƒ.Node": {
+            "name": "Road",
+            "components": {},
+            "children": [
+              {
+                "ƒ.Node": {
+                  "name": "Road_1",
+                  "components": {
+                    "ComponentMesh": [
+                      {
+                        "ƒ.ComponentMesh": {
+                          "idMesh": "MeshCube|2021-12-21T19:52:52.080Z|13369",
+                          "pivot": {
+                            "translation": "[6, 0, 20]",
+                            "rotation": "[0, 0, 0]",
+                            "scaling": "[12, 1, 40]"
+                          },
+                          "Component": {
+                            "active": true
+                          }
+                        }
+                      }
+                    ],
+                    "ComponentMaterial": [
+                      {
+                        "ƒ.ComponentMaterial": {
+                          "sortForAlpha": false,
+                          "clrPrimary": "[1, 1, 1, 1]",
+                          "clrSecondary": "[1, 1, 1, 1]",
+                          "pivot": {
+                            "translation": "[0, 0]",
+                            "rotation": 0,
+                            "scaling": "[1, 1]"
+                          },
+                          "Component": {
+                            "active": true
+                          },
+                          "idMaterial": "Material|2021-12-21T19:54:28.273Z|84962"
+                        }
+                      }
+                    ],
+                    "ComponentTransform": [
+                      {
+                        "ƒ.ComponentTransform": {
+                          "local": {
+                            "translation": "[0, 0, 0]",
+                            "rotation": "[0, 0, 0]",
+                            "scaling": "[1, 1, 1]"
+                          },
+                          "Component": {
+                            "active": true
+                          }
+                        }
+                      }
+                    ],
+                    "RoadComponentScript": [
+                      {
+                        "Script.RoadComponentScript": {
+                          "active": true,
+                          "message": "RoadComponentScript added to "
+                        }
+                      }
+                    ]
+                  },
+                  "children": []
+                }
+              },
+              {
+                "ƒ.Node": {
+                  "name": "Road_2",
+                  "components": {
+                    "ComponentMesh": [
+                      {
+                        "ƒ.ComponentMesh": {
+                          "idMesh": "MeshCube|2021-12-21T19:52:52.080Z|13369",
+                          "pivot": {
+                            "translation": "[6, 0, 20]",
+                            "rotation": "[0, 0, 0]",
+                            "scaling": "[12, 1, 40]"
+                          },
+                          "Component": {
+                            "active": true
+                          }
+                        }
+                      }
+                    ],
+                    "ComponentMaterial": [
+                      {
+                        "ƒ.ComponentMaterial": {
+                          "sortForAlpha": false,
+                          "clrPrimary": "[1, 1, 1, 1]",
+                          "clrSecondary": "[1, 1, 1, 1]",
+                          "pivot": {
+                            "translation": "[0, 0]",
+                            "rotation": 0,
+                            "scaling": "[1, 1]"
+                          },
+                          "Component": {
+                            "active": true
+                          },
+                          "idMaterial": "Material|2021-12-21T19:54:28.273Z|84962"
+                        }
+                      }
+                    ],
+                    "ComponentTransform": [
+                      {
+                        "ƒ.ComponentTransform": {
+                          "local": {
+                            "translation": "[0, 0, -40]",
+                            "rotation": "[0, 0, 0]",
+                            "scaling": "[1, 1, 1]"
+                          },
+                          "Component": {
+                            "active": true
+                          }
+                        }
+                      }
+                    ],
+                    "RoadComponentScript": [
+                      {
+                        "Script.RoadComponentScript": {
+                          "active": true,
+                          "message": "RoadComponentScript added to "
+                        }
+                      }
+                    ]
+                  },
+                  "children": []
+                }
+              },
+              {
+                "ƒ.Node": {
+                  "name": "Horrizon",
+                  "components": {
+                    "ComponentMesh": [
+                      {
+                        "ƒ.ComponentMesh": {
+                          "idMesh": "MeshQuad|2021-12-21T20:01:46.500Z|20384",
+                          "pivot": {
+                            "translation": "[6, 8, 0]",
+                            "rotation": "[0, 0, 0]",
+                            "scaling": "[100, 16, 1]"
+                          },
+                          "Component": {
+                            "active": true
+                          }
+                        }
+                      }
+                    ],
+                    "ComponentMaterial": [
+                      {
+                        "ƒ.ComponentMaterial": {
+                          "sortForAlpha": false,
+                          "clrPrimary": "[1, 1, 1, 1]",
+                          "clrSecondary": "[1, 1, 1, 1]",
+                          "pivot": {
+                            "translation": "[0, 0]",
+                            "rotation": 0,
+                            "scaling": "[1, 1]"
+                          },
+                          "Component": {
+                            "active": true
+                          },
+                          "idMaterial": "Material|2021-12-21T20:03:44.136Z|55105"
+                        }
+                      }
+                    ]
+                  },
+                  "children": []
+                }
+              }
+            ]
+          }
+        }
+      ],
+      "idResource": "Graph|2021-12-21T19:52:16.317Z|25080",
+      "type": "Graph"
+    }
+  }
+}
