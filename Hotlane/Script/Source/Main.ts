@@ -53,7 +53,7 @@ namespace Script {
     let cameraTransform = new f.ComponentTransform();
     cameraTransform.mtxLocal.mutate(
       {
-        translation: new f.Vector3(6,3,40),
+        translation: new f.Vector3(6,3,105),
         rotation: new f.Vector3(5,180,0),
       }
     );
@@ -88,7 +88,7 @@ namespace Script {
   }
  
   function update(_event: Event): void {
-    // f.Physics.world.simulate();  // if physics is included and used
+    f.Physics.world.simulate();  // if physics is included and used
     viewport.draw();
     f.AudioManager.default.update();
   }

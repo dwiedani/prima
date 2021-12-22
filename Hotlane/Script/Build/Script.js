@@ -79,7 +79,7 @@ var Script;
         cameraNode.addComponent(cmpListener);
         let cameraTransform = new f.ComponentTransform();
         cameraTransform.mtxLocal.mutate({
-            translation: new f.Vector3(6, 3, 40),
+            translation: new f.Vector3(6, 3, 105),
             rotation: new f.Vector3(5, 180, 0),
         });
         cameraNode.addComponent(cameraTransform);
@@ -105,7 +105,7 @@ var Script;
         f.Loop.stop();
     }
     function update(_event) {
-        // f.Physics.world.simulate();  // if physics is included and used
+        f.Physics.world.simulate(); // if physics is included and used
         viewport.draw();
         f.AudioManager.default.update();
     }
@@ -139,13 +139,15 @@ var Script;
             f.Loop.addEventListener("loopFrame" /* LOOP_FRAME */, this.update);
         };
         update = (_event) => {
-            let speed = 20 * f.Loop.timeFrameReal / 1000;
-            this.transform.translateZ(speed);
+            // Roads start to seperate when using frameTime
+            //let speed = 50 * f.Loop.timeFrameReal / 1000; 
+            let speed = 1;
             if (this.transform.translation.z >= this.roadLength) {
                 this.transform.mutate({
                     translation: this.startPosition,
                 });
             }
+            this.transform.translateZ(speed);
         };
         // Activate the functions of this component as response to events
         hndEvent = (_event) => {
