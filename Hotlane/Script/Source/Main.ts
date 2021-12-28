@@ -57,8 +57,8 @@ namespace Script {
     let cameraTransform = new f.ComponentTransform();
     cameraTransform.mtxLocal.mutate(
       {
-        translation: new f.Vector3(12,6,105),
-        rotation: new f.Vector3(5,180,0),
+        translation: new f.Vector3(12,8,105),
+        rotation: new f.Vector3(8,180,0),
       }
     );
     cameraNode.addComponent(cameraTransform);

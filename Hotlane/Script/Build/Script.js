@@ -10,9 +10,16 @@ var Script;
             let transformComponent = new f.ComponentTransform;
             this.addComponent(transformComponent);
             let body = f.MeshObj.LOAD("./assets/car.obj");
+            body.mtxLocal.mutate({
+                translation: new f.Vector3(0, -body.mtxLocal.scaling.y / 2, 0)
+            });
             this.addChild(body);
-            //this.addComponent(new f.ComponentMesh(new f.MeshCube))
-            this.addComponent(new f.ComponentMaterial(new f.Material("mtrAgent", f.ShaderUniColor, new f.CoatColored(new f.Color(1, 0, 0, 1)))));
+            this.addComponent(new f.ComponentMesh(new f.MeshCube));
+            this.addComponent(new f.ComponentMaterial(new f.Material("mtrAgent", f.ShaderFlat, new f.CoatColored(new f.Color(1, 0, 0, 1)))));
+            let carTexture = new f.TextureImage();
+            carTexture.load("../assets/carTexture.png");
+            let coat = new f.CoatTextured(new f.Color(255, 255, 255, 255), carTexture);
+            body.addComponent(new f.ComponentMaterial(new f.Material("Texture", f.ShaderTextureFlat, coat)));
             this.addComponent(new f.ComponentRigidbody(0.5, f.BODY_TYPE.DYNAMIC, f.COLLIDER_TYPE.CUBE, f.COLLISION_GROUP.DEFAULT, transformComponent.mtxLocal));
             this.addComponent(new Script.AgentComponentScript);
         }
@@ -165,8 +172,8 @@ var Script;
         cameraNode.addComponent(cmpListener);
         let cameraTransform = new f.ComponentTransform();
         cameraTransform.mtxLocal.mutate({
-            translation: new f.Vector3(12, 6, 105),
-            rotation: new f.Vector3(5, 180, 0),
+            translation: new f.Vector3(12, 8, 105),
+            rotation: new f.Vector3(8, 180, 0),
         });
         cameraNode.addComponent(cameraTransform);
         graph.addChild(cameraNode);

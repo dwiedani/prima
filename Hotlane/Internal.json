@@ -10,12 +10,23 @@
     "ƒ.Material": {
       "name": "RoadMaterial",
       "idResource": "Material|2021-12-21T19:54:28.273Z|84962",
-      "shader": "ShaderTexture",
+      "shader": "ShaderTextureFlat",
       "coat": {
         "ƒ.CoatTextured": {
           "color": "[0.9921568627450981, 0.8666666666666667, 0.8666666666666667, 1]",
           "idTexture": "TextureImage|2021-12-24T22:13:09.932Z|31331"
         }
+      }
+    }
+  },
+  "TextureImage|2021-12-24T22:13:09.932Z|31331": {
+    "ƒ.TextureImage": {
+      "url": "assets\\roadTextureTop.png",
+      "type": "TextureImage",
+      "Texture": {
+        "idResource": "TextureImage|2021-12-24T22:13:09.932Z|31331",
+        "name": "assets\\roadTextureTop.png",
+        "mipmap": "CRISP"
       }
     }
   },
@@ -52,7 +63,7 @@
     "ƒ.Material": {
       "name": "Horrizon",
       "idResource": "Material|2021-12-21T20:03:44.136Z|55105",
-      "shader": "ShaderTexture",
+      "shader": "ShaderTextureFlat",
       "coat": {
         "ƒ.CoatTextured": {
           "color": "[1, 1, 1, 1]"
@@ -64,7 +75,7 @@
     "ƒ.Material": {
       "name": "AgentMaterial",
       "idResource": "Material|2021-12-22T18:03:33.957Z|80277",
-      "shader": "ShaderTexture",
+      "shader": "ShaderTextureFlat",
       "coat": {
         "ƒ.CoatTextured": {
           "color": "[1, 1, 1, 1]"
@@ -108,27 +119,34 @@
       }
     }
   },
+  "Material|2021-12-24T22:15:01.950Z|48142": {
+    "ƒ.Material": {
+      "name": "RoadBottomMaterial",
+      "idResource": "Material|2021-12-24T22:15:01.950Z|48142",
+      "shader": "ShaderTextureFlat",
+      "coat": {
+        "ƒ.CoatTextured": {
+          "color": "[1, 1, 1, 1]",
+          "idTexture": "TextureImage|2021-12-24T22:12:14.232Z|99720"
+        }
+      }
+    }
+  },
+  "TextureImage|2021-12-24T22:12:14.232Z|99720": {
+    "ƒ.TextureImage": {
+      "url": "assets\\roadTextureBottom.png",
+      "type": "TextureImage",
+      "Texture": {
+        "idResource": "TextureImage|2021-12-24T22:12:14.232Z|99720",
+        "name": "assets\\roadTextureBottom.png",
+        "mipmap": "CRISP"
+      }
+    }
+  },
   "Graph|2021-12-21T19:52:16.317Z|25080": {
     "ƒ.Graph": {
       "name": "Scene",
-      "components": {
-        "ComponentLight": [
-          {
-            "ƒ.ComponentLight": {
-              "pivot": {
-                "translation": "[0, 0, 0]",
-                "rotation": "[0, 0, 0]",
-                "scaling": "[1, 1, 1]"
-              },
-              "light": {
-                "ƒ.LightAmbient": {
-                  "color": "[1, 1, 1, 1]"
-                }
-              }
-            }
-          }
-        ]
-      },
+      "components": {},
       "children": [
         {
           "ƒ.Node": {
@@ -149,7 +167,7 @@
                     "isTrigger": false,
                     "id": 0,
                     "pivot": {
-                      "translation": "[12, 0, 0]",
+                      "translation": "[12, -0.10000002384185791, 0]",
                       "rotation": "[0, 0, 0]",
                       "scaling": "[24, 0.0010000000474974513, 200]"
                     },
@@ -202,6 +220,36 @@
                     },
                     "Component": {
                       "active": true
+                    }
+                  }
+                }
+              ],
+              "ComponentLight": [
+                {
+                  "ƒ.ComponentLight": {
+                    "pivot": {
+                      "translation": "[0, 0, 0]",
+                      "rotation": "[0, 0, 0]",
+                      "scaling": "[1, 1, 1]"
+                    },
+                    "light": {
+                      "ƒ.LightAmbient": {
+                        "color": "[0.3686274509803922, 0.3686274509803922, 0.3686274509803922, 1]"
+                      }
+                    }
+                  }
+                },
+                {
+                  "ƒ.ComponentLight": {
+                    "pivot": {
+                      "translation": "[0, 0, 0]",
+                      "rotation": "[30, 0, 0]",
+                      "scaling": "[1, 1, 1]"
+                    },
+                    "light": {
+                      "ƒ.LightDirectional": {
+                        "color": "[1, 1, 1, 1]"
+                      }
                     }
                   }
                 }
@@ -263,12 +311,126 @@
                       {
                         "Script.RoadComponentScript": {
                           "active": true,
-                          "message": "RoadComponentScript added to "
+                          "message": "RoadComponentScript added to ",
+                          "speedInc": 20
                         }
                       }
                     ]
                   },
-                  "children": []
+                  "children": [
+                    {
+                      "ƒ.Node": {
+                        "name": "Streetlight",
+                        "components": {
+                          "ComponentTransform": [
+                            {
+                              "ƒ.ComponentTransform": {
+                                "local": {
+                                  "translation": "[0, 0, 0]",
+                                  "rotation": "[0, 0, 0]",
+                                  "scaling": "[1, 1, 1]"
+                                },
+                                "Component": {
+                                  "active": true
+                                }
+                              }
+                            }
+                          ],
+                          "ComponentMesh": [
+                            {
+                              "ƒ.ComponentMesh": {
+                                "idMesh": "MeshCube|2021-12-21T19:52:52.080Z|13369",
+                                "pivot": {
+                                  "translation": "[0, 2.499999523162842, 0]",
+                                  "rotation": "[0, 0, 0]",
+                                  "scaling": "[0.10000001639127731, 5, 0.10000000149011612]"
+                                },
+                                "Component": {
+                                  "active": true
+                                }
+                              }
+                            }
+                          ],
+                          "ComponentMaterial": [
+                            {
+                              "ƒ.ComponentMaterial": {
+                                "sortForAlpha": false,
+                                "clrPrimary": "[1, 1, 1, 1]",
+                                "clrSecondary": "[1, 1, 1, 1]",
+                                "pivot": {
+                                  "translation": "[0, 0]",
+                                  "rotation": 0,
+                                  "scaling": "[1, 1]"
+                                },
+                                "Component": {
+                                  "active": true
+                                },
+                                "idMaterial": "Material|2021-12-22T18:47:41.546Z|87667"
+                              }
+                            }
+                          ],
+                          "ComponentLight": []
+                        },
+                        "children": []
+                      }
+                    },
+                    {
+                      "ƒ.Node": {
+                        "name": "Streetlight",
+                        "components": {
+                          "ComponentTransform": [
+                            {
+                              "ƒ.ComponentTransform": {
+                                "local": {
+                                  "translation": "[0, 0, 50]",
+                                  "rotation": "[0, 0, 0]",
+                                  "scaling": "[1, 1, 1]"
+                                },
+                                "Component": {
+                                  "active": true
+                                }
+                              }
+                            }
+                          ],
+                          "ComponentMesh": [
+                            {
+                              "ƒ.ComponentMesh": {
+                                "idMesh": "MeshCube|2021-12-21T19:52:52.080Z|13369",
+                                "pivot": {
+                                  "translation": "[0, 2.499999523162842, 0]",
+                                  "rotation": "[0, 0, 0]",
+                                  "scaling": "[0.10000001639127731, 5, 0.10000000149011612]"
+                                },
+                                "Component": {
+                                  "active": true
+                                }
+                              }
+                            }
+                          ],
+                          "ComponentMaterial": [
+                            {
+                              "ƒ.ComponentMaterial": {
+                                "sortForAlpha": false,
+                                "clrPrimary": "[1, 1, 1, 1]",
+                                "clrSecondary": "[1, 1, 1, 1]",
+                                "pivot": {
+                                  "translation": "[0, 0]",
+                                  "rotation": 0,
+                                  "scaling": "[1, 1]"
+                                },
+                                "Component": {
+                                  "active": true
+                                },
+                                "idMaterial": "Material|2021-12-22T18:47:41.546Z|87667"
+                              }
+                            }
+                          ],
+                          "ComponentLight": []
+                        },
+                        "children": []
+                      }
+                    }
+                  ]
                 }
               },
               {
@@ -326,12 +488,126 @@
                       {
                         "Script.RoadComponentScript": {
                           "active": true,
-                          "message": "RoadComponentScript added to "
+                          "message": "RoadComponentScript added to ",
+                          "speedInc": 20
                         }
                       }
                     ]
                   },
-                  "children": []
+                  "children": [
+                    {
+                      "ƒ.Node": {
+                        "name": "Streetlight",
+                        "components": {
+                          "ComponentTransform": [
+                            {
+                              "ƒ.ComponentTransform": {
+                                "local": {
+                                  "translation": "[0, 0, 0]",
+                                  "rotation": "[0, 0, 0]",
+                                  "scaling": "[1, 1, 1]"
+                                },
+                                "Component": {
+                                  "active": true
+                                }
+                              }
+                            }
+                          ],
+                          "ComponentMesh": [
+                            {
+                              "ƒ.ComponentMesh": {
+                                "idMesh": "MeshCube|2021-12-21T19:52:52.080Z|13369",
+                                "pivot": {
+                                  "translation": "[0, 2.499999523162842, 0]",
+                                  "rotation": "[0, 0, 0]",
+                                  "scaling": "[0.10000001639127731, 5, 0.10000000149011612]"
+                                },
+                                "Component": {
+                                  "active": true
+                                }
+                              }
+                            }
+                          ],
+                          "ComponentMaterial": [
+                            {
+                              "ƒ.ComponentMaterial": {
+                                "sortForAlpha": false,
+                                "clrPrimary": "[1, 1, 1, 1]",
+                                "clrSecondary": "[1, 1, 1, 1]",
+                                "pivot": {
+                                  "translation": "[0, 0]",
+                                  "rotation": 0,
+                                  "scaling": "[1, 1]"
+                                },
+                                "Component": {
+                                  "active": true
+                                },
+                                "idMaterial": "Material|2021-12-22T18:47:41.546Z|87667"
+                              }
+                            }
+                          ],
+                          "ComponentLight": []
+                        },
+                        "children": []
+                      }
+                    },
+                    {
+                      "ƒ.Node": {
+                        "name": "Streetlight",
+                        "components": {
+                          "ComponentTransform": [
+                            {
+                              "ƒ.ComponentTransform": {
+                                "local": {
+                                  "translation": "[0, 0, 50]",
+                                  "rotation": "[0, 0, 0]",
+                                  "scaling": "[1, 1, 1]"
+                                },
+                                "Component": {
+                                  "active": true
+                                }
+                              }
+                            }
+                          ],
+                          "ComponentMesh": [
+                            {
+                              "ƒ.ComponentMesh": {
+                                "idMesh": "MeshCube|2021-12-21T19:52:52.080Z|13369",
+                                "pivot": {
+                                  "translation": "[0, 2.499999523162842, 0]",
+                                  "rotation": "[0, 0, 0]",
+                                  "scaling": "[0.10000001639127731, 5, 0.10000000149011612]"
+                                },
+                                "Component": {
+                                  "active": true
+                                }
+                              }
+                            }
+                          ],
+                          "ComponentMaterial": [
+                            {
+                              "ƒ.ComponentMaterial": {
+                                "sortForAlpha": false,
+                                "clrPrimary": "[1, 1, 1, 1]",
+                                "clrSecondary": "[1, 1, 1, 1]",
+                                "pivot": {
+                                  "translation": "[0, 0]",
+                                  "rotation": 0,
+                                  "scaling": "[1, 1]"
+                                },
+                                "Component": {
+                                  "active": true
+                                },
+                                "idMaterial": "Material|2021-12-22T18:47:41.546Z|87667"
+                              }
+                            }
+                          ],
+                          "ComponentLight": []
+                        },
+                        "children": []
+                      }
+                    }
+                  ]
                 }
               }
             ]
@@ -604,41 +880,6 @@
       "coat": {
         "ƒ.CoatColored": {
           "color": "[1, 1, 1, 1]"
-        }
-      }
-    }
-  },
-  "TextureImage|2021-12-24T22:12:14.232Z|99720": {
-    "ƒ.TextureImage": {
-      "url": "assets\\roadTextureBottom.png",
-      "type": "TextureImage",
-      "Texture": {
-        "idResource": "TextureImage|2021-12-24T22:12:14.232Z|99720",
-        "name": "assets\\roadTextureBottom.png",
-        "mipmap": "CRISP"
-      }
-    }
-  },
-  "TextureImage|2021-12-24T22:13:09.932Z|31331": {
-    "ƒ.TextureImage": {
-      "url": "assets\\roadTextureTop.png",
-      "type": "TextureImage",
-      "Texture": {
-        "idResource": "TextureImage|2021-12-24T22:13:09.932Z|31331",
-        "name": "assets\\roadTextureTop.png",
-        "mipmap": "CRISP"
-      }
-    }
-  },
-  "Material|2021-12-24T22:15:01.950Z|48142": {
-    "ƒ.Material": {
-      "name": "RoadBottomMaterial",
-      "idResource": "Material|2021-12-24T22:15:01.950Z|48142",
-      "shader": "ShaderTexture",
-      "coat": {
-        "ƒ.CoatTextured": {
-          "color": "[1, 1, 1, 1]",
-          "idTexture": "TextureImage|2021-12-24T22:12:14.232Z|99720"
         }
       }
     }
