@@ -2,16 +2,12 @@ namespace Script {
   import f = FudgeCore;
   f.Project.registerScriptNamespace(Script);  // Register the namespace to FUDGE for serialization
 
-  export class RoadComponentScript extends f.ComponentScript {
+  export class RoadControllerComponentScript extends f.ComponentScript {
     // Register the script as component for use in the editor via drag&drop
     public static readonly iSubclass: number = f.Component.registerSubclass(CustomComponentScript);
     // Properties may be mutated by users in the editor via the automatically created user interface
-    public message: string = "RoadComponentScript added to ";
-
-    private transform: f.Matrix4x4;
-    private startPosition: f.Vector3;
-    private roadLength: number;
-    private speedInc: number = 20;
+    public message: string = "RoadControllerComponentScript added to ";
+    private roads: f.Matrix4x4[] = [];
 
 
     constructor() {
@@ -28,24 +24,25 @@ namespace Script {
     }
 
     public create = (_event: Event): void => {
-      this.roadLength = this.node.getComponent(f.ComponentMesh).mtxPivot.scaling.z;
-      this.transform = this.node.getComponent(f.ComponentTransform).mtxLocal;
-      this.startPosition = new f.Vector3(this.transform.translation.x,this.transform.translation.y,-this.roadLength);
-      f.Loop.addEventListener(f.EVENT.LOOP_FRAME, this.update);
+      setTimeout(()=>{
+        let roadNodes: f.Node[] = this.node.getChildren();
+        roadNodes.forEach((road: f.Node) => {
+          this.roads.push(road.getComponent(f.ComponentTransform).mtxLocal);
+        });
+        f.Loop.addEventListener(f.EVENT.LOOP_FRAME, this.update);
+      },1000);
+      
     }
 
     public update = (_event: Event): void => {
       // Roads start to seperate when using frameTime
-      let speed = this.speedInc * f.Loop.timeFrameReal / 1000; 
-      this.speedInc += 0.01;
-      //let speed = 1;
-
-      if(this.transform.translation.z >= this.roadLength){
-        this.transform.mutate({
-          translation: this.startPosition,
-        });
-      } 
-      this.transform.translateZ(speed);
+      let speed = 50 * f.Loop.timeFrameReal / 1000; 
+      this.roads[0].translateZ(speed);
+      this.roads[1].translateZ(speed);
+      //let speed = 1; 
+      //this.roads.forEach((road: f.Matrix4x4) => {
+      //  road.translateZ(speed);
+      //});
     }
 
     // Activate the functions of this component as response to events

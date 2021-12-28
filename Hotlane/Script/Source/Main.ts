@@ -5,7 +5,6 @@ namespace Script {
   let viewport: f.Viewport;
   let graph: f.Node;
   let cameraNode: f.Node;
-  
   window.addEventListener("load", init);
 
   // show dialog for startup
@@ -47,13 +46,18 @@ namespace Script {
     viewport = new f.Viewport();
     viewport.initialize("Viewport", graph, cmpCamera, canvas);
 
+    // get agent spawn point and create new agent
+    let agentSpawnNode: f.Node = graph.getChildrenByName("Agents")[0];
+    let agent = new Agent("Agent");
+    agentSpawnNode.addChild(agent);
+
     // setup audio
     let cmpListener = new f.ComponentAudioListener();
     cameraNode.addComponent(cmpListener);
     let cameraTransform = new f.ComponentTransform();
     cameraTransform.mtxLocal.mutate(
       {
-        translation: new f.Vector3(6,3,105),
+        translation: new f.Vector3(12,6,105),
         rotation: new f.Vector3(5,180,0),
       }
     );
