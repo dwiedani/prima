@@ -11,7 +11,8 @@ namespace Script {
     private transform: f.Matrix4x4;
     private startPosition: f.Vector3;
     private roadLength: number;
-    private speedInc: number = 20;
+    private speedInc: number = 50;
+    private maxSpeed: number = 80;
 
 
     constructor() {
@@ -36,10 +37,10 @@ namespace Script {
 
     public update = (_event: Event): void => {
       // Roads start to seperate when using frameTime
-      let speed = this.speedInc * f.Loop.timeFrameReal / 1000; 
-      this.speedInc += 0.01;
+      let speed = this.speedInc * (f.Loop.timeFrameReal / 1000); 
+      this.speedInc += this.speedInc <= this.maxSpeed ? 0.01 : 0;
       //let speed = 1;
-
+      
       if(this.transform.translation.z >= this.roadLength){
         this.transform.mutate({
           translation: this.startPosition,

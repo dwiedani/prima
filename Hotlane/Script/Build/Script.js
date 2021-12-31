@@ -3,17 +3,19 @@ var Script;
 (function (Script) {
     var f = FudgeCore;
     class Agent extends f.Node {
-        agentName;
         wheels = [];
-        constructor(agentName) {
-            super(agentName);
-            this.agentName = agentName;
+        constructor(name) {
+            super(name);
             let transformComponent = new f.ComponentTransform;
             this.addComponent(transformComponent);
             let body = f.MeshObj.LOAD("./assets/car.obj");
             body.mtxLocal.mutate({
                 translation: new f.Vector3(0, -body.mtxLocal.scaling.y / 2, 0)
             });
+            this.mtxLocal.mutate({
+                scaling: body.mtxLocal.scaling
+            });
+            this.addChild(body);
             let carTexture = new f.TextureImage();
             carTexture.load("../assets/carTexture.png");
             let coat = new f.CoatTextured(new f.Color(255, 255, 255, 255), carTexture);
@@ -26,15 +28,19 @@ var Script;
             for (let i = 0; i <= 3; i++) {
                 this.wheels.push(f.MeshObj.LOAD("./assets/wheel-" + i + ".obj"));
             }
+            let wheelTexture = new f.TextureImage();
+            wheelTexture.load("../assets/wheelTexture.png");
+            let wheelCoat = new f.CoatTextured(new f.Color(255, 255, 255, 255), wheelTexture);
             this.wheels.forEach((wheel) => {
                 wheel.mtxLocal.mutate({
                     translation: new f.Vector3(0, -body.mtxLocal.scaling.y / 2, 0)
                 });
+                wheel.addComponent(new f.ComponentMaterial(new f.Material("Texture", f.ShaderTextureFlat, wheelCoat)));
                 this.addChild(wheel);
             });
         }
-        getName() {
-            return this.agentName;
+        getWheels() {
+            return this.wheels;
         }
     }
     Script.Agent = Agent;
@@ -47,13 +53,10 @@ var Script;
         // Register the script as component for use in the editor via drag&drop
         static iSubclass = f.Component.registerSubclass(AgentComponentScript);
         // Properties may be mutated by users in the editor via the automatically created user interface
-        message = "AgentComponentScript added to ";
         agentCanMove = true;
         agentSpeed = 20.0;
         agentControl;
-        agentControlTurn;
-        maxTurnAngle = 25;
-        agentTransform;
+        //private agentTransform: f.Matrix4x4;
         agentBody;
         constructor() {
             super();
@@ -67,7 +70,7 @@ var Script;
             this.addEventListener("componentRemove" /* COMPONENT_REMOVE */, this.hndEvent);
         }
         create = () => {
-            this.agentTransform = this.node.getComponent(f.ComponentTransform).mtxLocal;
+            //this.agentTransform = this.node.getComponent(f.ComponentTransform).mtxLocal;
             this.agentBody = this.node.getComponent(f.ComponentRigidbody);
             f.Loop.addEventListener("loopFrame" /* LOOP_FRAME */, this.update);
         };
@@ -100,17 +103,67 @@ var Script;
 })(Script || (Script = {}));
 var Script;
 (function (Script) {
-    var ƒ = FudgeCore;
-    ƒ.Project.registerScriptNamespace(Script); // Register the namespace to FUDGE for serialization
-    class CustomComponentScript extends ƒ.ComponentScript {
+    var f = FudgeCore;
+    f.Project.registerScriptNamespace(Script); // Register the namespace to FUDGE for serialization
+    class CameraComponentScript extends f.ComponentScript {
         // Register the script as component for use in the editor via drag&drop
-        static iSubclass = ƒ.Component.registerSubclass(CustomComponentScript);
+        static iSubclass = f.Component.registerSubclass(CameraComponentScript);
+        agent;
+        transform;
+        offset = new f.Vector3(0, 0, 0);
+        rotation = new f.Vector3(0, 0, 0);
+        constructor() {
+            super();
+            // Don't start when running in editor
+            if (f.Project.mode == f.MODE.EDITOR)
+                return;
+            // Listen to this component being added to or removed from a node
+            this.addEventListener("componentAdd" /* COMPONENT_ADD */, this.hndEvent);
+            this.addEventListener("componentRemove" /* COMPONENT_REMOVE */, this.hndEvent);
+            this.addEventListener("nodeDeserialized" /* NODE_DESERIALIZED */, this.hndEvent);
+            f.Loop.addEventListener("loopFrame" /* LOOP_FRAME */, this.update);
+        }
+        update = (_event) => {
+            if (this.agent) {
+                this.transform.mtxLocal.mutate({
+                    translation: new f.Vector3(this.agent.mtxWorld.translation.x + this.offset.x, this.agent.mtxWorld.translation.y + this.offset.y, this.agent.mtxWorld.translation.z + this.offset.z)
+                });
+            }
+        };
+        // Activate the functions of this component as response to events
+        hndEvent = (_event) => {
+            switch (_event.type) {
+                case "componentAdd" /* COMPONENT_ADD */:
+                    this.transform = this.node.getComponent(f.ComponentTransform);
+                    this.transform.mtxLocal.mutate({
+                        rotation: this.rotation
+                    });
+                    break;
+                case "componentRemove" /* COMPONENT_REMOVE */:
+                    this.removeEventListener("componentAdd" /* COMPONENT_ADD */, this.hndEvent);
+                    this.removeEventListener("componentRemove" /* COMPONENT_REMOVE */, this.hndEvent);
+                    break;
+                case "nodeDeserialized" /* NODE_DESERIALIZED */:
+                    // if deserialized the node is now fully reconstructed and access to all its components and children is possible
+                    break;
+            }
+        };
+    }
+    Script.CameraComponentScript = CameraComponentScript;
+})(Script || (Script = {}));
+var Script;
+(function (Script) {
+    var f = FudgeCore;
+    f.Project.registerScriptNamespace(Script); // Register the namespace to FUDGE for serialization
+    class CustomComponentScript extends f.ComponentScript {
+        // Register the script as component for use in the editor via drag&drop
+        static iSubclass = f.Component.registerSubclass(CustomComponentScript);
         // Properties may be mutated by users in the editor via the automatically created user interface
         message = "CustomComponentScript added to ";
         constructor() {
             super();
             // Don't start when running in editor
-            if (ƒ.Project.mode == ƒ.MODE.EDITOR)
+            if (f.Project.mode == f.MODE.EDITOR)
                 return;
             // Listen to this component being added to or removed from a node
             this.addEventListener("componentAdd" /* COMPONENT_ADD */, this.hndEvent);
@@ -121,7 +174,7 @@ var Script;
         hndEvent = (_event) => {
             switch (_event.type) {
                 case "componentAdd" /* COMPONENT_ADD */:
-                    ƒ.Debug.log(this.message, this.node);
+                    f.Debug.log(this.message, this.node);
                     break;
                 case "componentRemove" /* COMPONENT_REMOVE */:
                     this.removeEventListener("componentAdd" /* COMPONENT_ADD */, this.hndEvent);
@@ -142,6 +195,7 @@ var Script;
     let viewport;
     let graph;
     let cameraNode;
+    let agent;
     window.addEventListener("load", init);
     // show dialog for startup
     let dialog;
@@ -175,17 +229,18 @@ var Script;
         viewport.initialize("Viewport", graph, cmpCamera, canvas);
         // get agent spawn point and create new agent
         let agentSpawnNode = graph.getChildrenByName("Agents")[0];
-        let agent = new Script.Agent("Agent");
+        agent = new Script.Agent("Agent");
         agentSpawnNode.addChild(agent);
         // setup audio
         let cmpListener = new f.ComponentAudioListener();
         cameraNode.addComponent(cmpListener);
         let cameraTransform = new f.ComponentTransform();
-        cameraTransform.mtxLocal.mutate({
-            translation: new f.Vector3(12, 8, 105),
-            rotation: new f.Vector3(8, 180, 0),
-        });
         cameraNode.addComponent(cameraTransform);
+        let scrCamera = new Script.CameraComponentScript();
+        scrCamera.agent = agent;
+        scrCamera.offset = new f.Vector3(0, 2, 12);
+        scrCamera.rotation = new f.Vector3(5, 180, 0);
+        cameraNode.addComponent(scrCamera);
         graph.addChild(cameraNode);
         f.AudioManager.default.listenWith(cmpListener);
         f.AudioManager.default.listenTo(graph);
@@ -225,7 +280,8 @@ var Script;
         transform;
         startPosition;
         roadLength;
-        speedInc = 20;
+        speedInc = 50;
+        maxSpeed = 80;
         constructor() {
             super();
             // Don't start when running in editor
@@ -244,8 +300,8 @@ var Script;
         };
         update = (_event) => {
             // Roads start to seperate when using frameTime
-            let speed = this.speedInc * f.Loop.timeFrameReal / 1000;
-            this.speedInc += 0.01;
+            let speed = this.speedInc * (f.Loop.timeFrameReal / 1000);
+            this.speedInc += this.speedInc <= this.maxSpeed ? 0.01 : 0;
             //let speed = 1;
             if (this.transform.translation.z >= this.roadLength) {
                 this.transform.mutate({
@@ -272,63 +328,5 @@ var Script;
         };
     }
     Script.RoadComponentScript = RoadComponentScript;
-})(Script || (Script = {}));
-var Script;
-(function (Script) {
-    var f = FudgeCore;
-    f.Project.registerScriptNamespace(Script); // Register the namespace to FUDGE for serialization
-    class RoadControllerComponentScript extends f.ComponentScript {
-        // Register the script as component for use in the editor via drag&drop
-        static iSubclass = f.Component.registerSubclass(Script.CustomComponentScript);
-        // Properties may be mutated by users in the editor via the automatically created user interface
-        message = "RoadControllerComponentScript added to ";
-        roads = [];
-        constructor() {
-            super();
-            // Don't start when running in editor
-            if (f.Project.mode == f.MODE.EDITOR)
-                return;
-            // Listen to this component being added to or removed from a node
-            this.addEventListener("componentAdd" /* COMPONENT_ADD */, this.hndEvent);
-            this.addEventListener("componentRemove" /* COMPONENT_REMOVE */, this.hndEvent);
-            this.addEventListener("nodeDeserialized" /* NODE_DESERIALIZED */, this.hndEvent);
-        }
-        create = (_event) => {
-            setTimeout(() => {
-                let roadNodes = this.node.getChildren();
-                roadNodes.forEach((road) => {
-                    this.roads.push(road.getComponent(f.ComponentTransform).mtxLocal);
-                });
-                f.Loop.addEventListener("loopFrame" /* LOOP_FRAME */, this.update);
-            }, 1000);
-        };
-        update = (_event) => {
-            // Roads start to seperate when using frameTime
-            let speed = 50 * f.Loop.timeFrameReal / 1000;
-            this.roads[0].translateZ(speed);
-            this.roads[1].translateZ(speed);
-            //let speed = 1; 
-            //this.roads.forEach((road: f.Matrix4x4) => {
-            //  road.translateZ(speed);
-            //});
-        };
-        // Activate the functions of this component as response to events
-        hndEvent = (_event) => {
-            switch (_event.type) {
-                case "componentAdd" /* COMPONENT_ADD */:
-                    f.Debug.log(this.message, this.node);
-                    this.create(_event);
-                    break;
-                case "componentRemove" /* COMPONENT_REMOVE */:
-                    this.removeEventListener("componentAdd" /* COMPONENT_ADD */, this.hndEvent);
-                    this.removeEventListener("componentRemove" /* COMPONENT_REMOVE */, this.hndEvent);
-                    break;
-                case "nodeDeserialized" /* NODE_DESERIALIZED */:
-                    // if deserialized the node is now fully reconstructed and access to all its components and children is possible
-                    break;
-            }
-        };
-    }
-    Script.RoadControllerComponentScript = RoadControllerComponentScript;
 })(Script || (Script = {}));
 //# sourceMappingURL=Script.js.map

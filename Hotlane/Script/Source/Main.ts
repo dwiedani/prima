@@ -5,6 +5,7 @@ namespace Script {
   let viewport: f.Viewport;
   let graph: f.Node;
   let cameraNode: f.Node;
+  let agent: f.Node;
   window.addEventListener("load", init);
 
   // show dialog for startup
@@ -48,20 +49,20 @@ namespace Script {
 
     // get agent spawn point and create new agent
     let agentSpawnNode: f.Node = graph.getChildrenByName("Agents")[0];
-    let agent = new Agent("Agent");
+    agent = new Agent("Agent");
     agentSpawnNode.addChild(agent);
 
     // setup audio
     let cmpListener = new f.ComponentAudioListener();
     cameraNode.addComponent(cmpListener);
     let cameraTransform = new f.ComponentTransform();
-    cameraTransform.mtxLocal.mutate(
-      {
-        translation: new f.Vector3(12,8,105),
-        rotation: new f.Vector3(8,180,0),
-      }
-    );
     cameraNode.addComponent(cameraTransform);
+
+    let scrCamera = new CameraComponentScript();
+    scrCamera.agent = agent;
+    scrCamera.offset = new f.Vector3(0,2,12);
+    scrCamera.rotation = new f.Vector3(5,180,0);
+    cameraNode.addComponent(scrCamera);
     
     graph.addChild(cameraNode);
 

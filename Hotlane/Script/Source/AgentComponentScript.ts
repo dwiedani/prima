@@ -6,19 +6,16 @@ namespace Script {
     // Register the script as component for use in the editor via drag&drop
     public static readonly iSubclass: number = f.Component.registerSubclass(AgentComponentScript);
     // Properties may be mutated by users in the editor via the automatically created user interface
-    public message: string = "AgentComponentScript added to ";
-    public agentCanMove: boolean = true;
-    public agentSpeed: number = 20.0;
-    public agentControl: f.Control;
-    public agentControlTurn: f.Control;
-    public maxTurnAngle: number = 25;
-    public agentTransform: f.Matrix4x4;
-    public agentBody: f.ComponentRigidbody;
+    private agentCanMove: boolean = true;
+    private agentSpeed: number = 20.0;
+    private agentControl: f.Control;
+    //private agentTransform: f.Matrix4x4;
+    private agentBody: f.ComponentRigidbody; 
 
     constructor() {
       super();
       this.agentControl = new f.Control("Movement", 1, f.CONTROL_TYPE.PROPORTIONAL);
-      this.agentControl.setDelay(1);
+      this.agentControl.setDelay(1);      
 
       // Don't start when running in editor
       if (f.Project.mode == f.MODE.EDITOR)
@@ -31,7 +28,7 @@ namespace Script {
 
 
     public create = () => {
-      this.agentTransform = this.node.getComponent(f.ComponentTransform).mtxLocal;
+      //this.agentTransform = this.node.getComponent(f.ComponentTransform).mtxLocal;
       this.agentBody = this.node.getComponent(f.ComponentRigidbody);
       f.Loop.addEventListener(f.EVENT.LOOP_FRAME, this.update);
     }
@@ -46,7 +43,7 @@ namespace Script {
       
       this.agentBody.applyForce(f.Vector3.SCALE(f.Vector3.X(), this.agentSpeed * this.agentControl.getOutput()));
       this.agentBody.setRotation(new f.Vector3(0, -this.agentBody.getVelocity().x,0));
-      
+  
     }
 
 

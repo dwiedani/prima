@@ -2,13 +2,13 @@ namespace Script {
   import f = FudgeCore;
   f.Project.registerScriptNamespace(Script);  // Register the namespace to FUDGE for serialization
 
-  export class RoadControllerComponentScript extends f.ComponentScript {
+  export class CameraComponentScript extends f.ComponentScript {
     // Register the script as component for use in the editor via drag&drop
-    public static readonly iSubclass: number = f.Component.registerSubclass(CustomComponentScript);
-    // Properties may be mutated by users in the editor via the automatically created user interface
-    public message: string = "RoadControllerComponentScript added to ";
-    private roads: f.Matrix4x4[] = [];
-
+    public static readonly iSubclass: number = f.Component.registerSubclass(CameraComponentScript);
+    public agent: f.Node;
+    private transform: f.ComponentTransform;
+    public offset: f.Vector3 = new f.Vector3(0,0,0);
+    public rotation: f.Vector3 = new f.Vector3(0,0,0);
 
     constructor() {
       super();
@@ -21,36 +21,25 @@ namespace Script {
       this.addEventListener(f.EVENT.COMPONENT_ADD, this.hndEvent);
       this.addEventListener(f.EVENT.COMPONENT_REMOVE, this.hndEvent);
       this.addEventListener(f.EVENT.NODE_DESERIALIZED, this.hndEvent);
-    }
-
-    public create = (_event: Event): void => {
-      setTimeout(()=>{
-        let roadNodes: f.Node[] = this.node.getChildren();
-        roadNodes.forEach((road: f.Node) => {
-          this.roads.push(road.getComponent(f.ComponentTransform).mtxLocal);
-        });
-        f.Loop.addEventListener(f.EVENT.LOOP_FRAME, this.update);
-      },1000);
-      
+      f.Loop.addEventListener(f.EVENT.LOOP_FRAME, this.update);
     }
 
     public update = (_event: Event): void => {
-      // Roads start to seperate when using frameTime
-      let speed = 50 * f.Loop.timeFrameReal / 1000; 
-      this.roads[0].translateZ(speed);
-      this.roads[1].translateZ(speed);
-      //let speed = 1; 
-      //this.roads.forEach((road: f.Matrix4x4) => {
-      //  road.translateZ(speed);
-      //});
+      if(this.agent) {
+        this.transform.mtxLocal.mutate({
+          translation: new f.Vector3(this.agent.mtxWorld.translation.x + this.offset.x, this.agent.mtxWorld.translation.y + this.offset.y, this.agent.mtxWorld.translation.z + this.offset.z)
+        });
+      }
     }
 
     // Activate the functions of this component as response to events
     public hndEvent = (_event: Event): void => {
       switch (_event.type) {
         case f.EVENT.COMPONENT_ADD:
-          f.Debug.log(this.message, this.node);
-          this.create(_event);
+          this.transform = this.node.getComponent(f.ComponentTransform);
+          this.transform.mtxLocal.mutate({
+            rotation: this.rotation
+          });
           break;
         case f.EVENT.COMPONENT_REMOVE:
           this.removeEventListener(f.EVENT.COMPONENT_ADD, this.hndEvent);

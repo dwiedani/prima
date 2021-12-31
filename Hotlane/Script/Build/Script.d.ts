@@ -1,24 +1,19 @@
 declare namespace Script {
     import f = FudgeCore;
     class Agent extends f.Node {
-        private agentName;
-        private wheels;
-        constructor(agentName: string);
-        getName(): string;
+        wheels: f.Node[];
+        constructor(name: string);
+        getWheels(): f.Node[];
     }
 }
 declare namespace Script {
     import f = FudgeCore;
     class AgentComponentScript extends f.ComponentScript {
         static readonly iSubclass: number;
-        message: string;
-        agentCanMove: boolean;
-        agentSpeed: number;
-        agentControl: f.Control;
-        agentControlTurn: f.Control;
-        maxTurnAngle: number;
-        agentTransform: f.Matrix4x4;
-        agentBody: f.ComponentRigidbody;
+        private agentCanMove;
+        private agentSpeed;
+        private agentControl;
+        private agentBody;
         constructor();
         create: () => void;
         update: (_event: Event) => void;
@@ -27,8 +22,21 @@ declare namespace Script {
     }
 }
 declare namespace Script {
-    import ƒ = FudgeCore;
-    class CustomComponentScript extends ƒ.ComponentScript {
+    import f = FudgeCore;
+    class CameraComponentScript extends f.ComponentScript {
+        static readonly iSubclass: number;
+        agent: f.Node;
+        private transform;
+        offset: f.Vector3;
+        rotation: f.Vector3;
+        constructor();
+        update: (_event: Event) => void;
+        hndEvent: (_event: Event) => void;
+    }
+}
+declare namespace Script {
+    import f = FudgeCore;
+    class CustomComponentScript extends f.ComponentScript {
         static readonly iSubclass: number;
         message: string;
         constructor();
@@ -46,18 +54,7 @@ declare namespace Script {
         private startPosition;
         private roadLength;
         private speedInc;
-        constructor();
-        create: (_event: Event) => void;
-        update: (_event: Event) => void;
-        hndEvent: (_event: Event) => void;
-    }
-}
-declare namespace Script {
-    import f = FudgeCore;
-    class RoadControllerComponentScript extends f.ComponentScript {
-        static readonly iSubclass: number;
-        message: string;
-        private roads;
+        private maxSpeed;
         constructor();
         create: (_event: Event) => void;
         update: (_event: Event) => void;
