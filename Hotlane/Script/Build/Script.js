@@ -4,6 +4,7 @@ var Script;
     var f = FudgeCore;
     class Agent extends f.Node {
         agentName;
+        wheels = [];
         constructor(agentName) {
             super(agentName);
             this.agentName = agentName;
@@ -13,15 +14,24 @@ var Script;
             body.mtxLocal.mutate({
                 translation: new f.Vector3(0, -body.mtxLocal.scaling.y / 2, 0)
             });
-            this.addChild(body);
-            this.addComponent(new f.ComponentMesh(new f.MeshCube));
-            this.addComponent(new f.ComponentMaterial(new f.Material("mtrAgent", f.ShaderFlat, new f.CoatColored(new f.Color(1, 0, 0, 1)))));
             let carTexture = new f.TextureImage();
             carTexture.load("../assets/carTexture.png");
             let coat = new f.CoatTextured(new f.Color(255, 255, 255, 255), carTexture);
             body.addComponent(new f.ComponentMaterial(new f.Material("Texture", f.ShaderTextureFlat, coat)));
+            this.addChild(body);
+            this.addComponent(new f.ComponentMaterial(new f.Material("mtrAgent", f.ShaderFlat, new f.CoatColored(new f.Color(1, 0, 0, 1)))));
             this.addComponent(new f.ComponentRigidbody(0.5, f.BODY_TYPE.DYNAMIC, f.COLLIDER_TYPE.CUBE, f.COLLISION_GROUP.DEFAULT, transformComponent.mtxLocal));
             this.addComponent(new Script.AgentComponentScript);
+            //wheels
+            for (let i = 0; i <= 3; i++) {
+                this.wheels.push(f.MeshObj.LOAD("./assets/wheel-" + i + ".obj"));
+            }
+            this.wheels.forEach((wheel) => {
+                wheel.mtxLocal.mutate({
+                    translation: new f.Vector3(0, -body.mtxLocal.scaling.y / 2, 0)
+                });
+                this.addChild(wheel);
+            });
         }
         getName() {
             return this.agentName;

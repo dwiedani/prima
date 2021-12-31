@@ -46,6 +46,7 @@ namespace Script {
       
       this.agentBody.applyForce(f.Vector3.SCALE(f.Vector3.X(), this.agentSpeed * this.agentControl.getOutput()));
       this.agentBody.setRotation(new f.Vector3(0, -this.agentBody.getVelocity().x,0));
+      
     }
 
 

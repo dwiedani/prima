@@ -2,6 +2,7 @@ declare namespace Script {
     import f = FudgeCore;
     class Agent extends f.Node {
         private agentName;
+        private wheels;
         constructor(agentName: string);
         getName(): string;
     }
