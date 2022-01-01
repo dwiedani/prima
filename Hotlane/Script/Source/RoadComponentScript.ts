@@ -10,9 +10,12 @@ namespace Script {
 
     private transform: f.Matrix4x4;
     private startPosition: f.Vector3;
+    private roadWidth: number;
     private roadLength: number;
     private speedInc: number = 50;
-    private maxSpeed: number = 80;
+    private maxSpeed: number = 100;
+    private obstacleWidthMin: number = 2;
+    private spawnTrigger: boolean = true;
 
 
     constructor() {
@@ -29,6 +32,7 @@ namespace Script {
     }
 
     public create = (_event: Event): void => {
+      this.roadWidth = this.node.getComponent(f.ComponentMesh).mtxPivot.scaling.x;
       this.roadLength = this.node.getComponent(f.ComponentMesh).mtxPivot.scaling.z;
       this.transform = this.node.getComponent(f.ComponentTransform).mtxLocal;
       this.startPosition = new f.Vector3(this.transform.translation.x,this.transform.translation.y,-this.roadLength);
@@ -37,16 +41,38 @@ namespace Script {
 
     public update = (_event: Event): void => {
       // Roads start to seperate when using frameTime
-      let speed = this.speedInc * (f.Loop.timeFrameReal / 1000); 
+      let speed: number = this.speedInc * (f.Loop.timeFrameReal / 1000); 
       this.speedInc += this.speedInc <= this.maxSpeed ? 0.01 : 0;
       //let speed = 1;
-      
+
+      this.reset();
+      this.transform.translateZ(speed);
+    }
+
+    public spawnObstacle(): void{
+      if(this.spawnTrigger){
+        this.spawnTrigger = false;
+        let obstacleWidth: number = (Math.random() * (this.roadWidth/3 - this.obstacleWidthMin)) + this.obstacleWidthMin;
+        let obstaclePosition: number = (Math.random() * (this.roadWidth - obstacleWidth));
+        this.node.addChild(new Obstacle("Obstacle", obstaclePosition,obstacleWidth));
+        setTimeout(()=>{
+          this.spawnTrigger = true;
+        },1000);
+      }
+    }
+
+    public reset(): void{
       if(this.transform.translation.z >= this.roadLength){
         this.transform.mutate({
           translation: this.startPosition,
         });
+
+        this.node.getChildrenByName("Obstacle").forEach((obstacle)=>{
+          this.node.removeChild(obstacle);
+        });
+
+        this.spawnObstacle();
       } 
-      this.transform.translateZ(speed);
     }
 
     // Activate the functions of this component as response to events

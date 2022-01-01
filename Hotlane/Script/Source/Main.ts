@@ -77,7 +77,7 @@ namespace Script {
   function start(): void {
     f.Loop.addEventListener(f.EVENT.LOOP_FRAME, update);
     document.addEventListener("visibilitychange", toggleLoop, false );
-    startLoop();  
+    startLoop();
   }
 
   function toggleLoop(): void {

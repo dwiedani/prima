@@ -1,7 +1,7 @@
 declare namespace Script {
     import f = FudgeCore;
     class Agent extends f.Node {
-        wheels: f.Node[];
+        private wheels;
         constructor(name: string);
         getWheels(): f.Node[];
     }
@@ -10,10 +10,11 @@ declare namespace Script {
     import f = FudgeCore;
     class AgentComponentScript extends f.ComponentScript {
         static readonly iSubclass: number;
-        private agentCanMove;
-        private agentSpeed;
-        private agentControl;
-        private agentBody;
+        private canMove;
+        private speed;
+        private control;
+        private body;
+        private zPosition;
         constructor();
         create: () => void;
         update: (_event: Event) => void;
@@ -47,17 +48,28 @@ declare namespace Script {
 }
 declare namespace Script {
     import f = FudgeCore;
+    class Obstacle extends f.Node {
+        constructor(name: string, position: number, width: number);
+    }
+}
+declare namespace Script {
+    import f = FudgeCore;
     class RoadComponentScript extends f.ComponentScript {
         static readonly iSubclass: number;
         message: string;
         private transform;
         private startPosition;
+        private roadWidth;
         private roadLength;
         private speedInc;
         private maxSpeed;
+        private obstacleWidthMin;
+        private spawnTrigger;
         constructor();
         create: (_event: Event) => void;
         update: (_event: Event) => void;
+        spawnObstacle(): void;
+        reset(): void;
         hndEvent: (_event: Event) => void;
     }
 }

@@ -6,16 +6,17 @@ namespace Script {
     // Register the script as component for use in the editor via drag&drop
     public static readonly iSubclass: number = f.Component.registerSubclass(AgentComponentScript);
     // Properties may be mutated by users in the editor via the automatically created user interface
-    private agentCanMove: boolean = true;
-    private agentSpeed: number = 20.0;
-    private agentControl: f.Control;
+    private canMove: boolean = true;
+    private speed: number = 5000.0;
+    private control: f.Control;
     //private agentTransform: f.Matrix4x4;
-    private agentBody: f.ComponentRigidbody; 
+    private body: f.ComponentRigidbody; 
+    private zPosition: number;
 
     constructor() {
       super();
-      this.agentControl = new f.Control("Movement", 1, f.CONTROL_TYPE.PROPORTIONAL);
-      this.agentControl.setDelay(1);      
+      this.control = new f.Control("Movement", 1, f.CONTROL_TYPE.PROPORTIONAL);
+      this.control.setDelay(1);      
 
       // Don't start when running in editor
       if (f.Project.mode == f.MODE.EDITOR)
@@ -29,7 +30,12 @@ namespace Script {
 
     public create = () => {
       //this.agentTransform = this.node.getComponent(f.ComponentTransform).mtxLocal;
-      this.agentBody = this.node.getComponent(f.ComponentRigidbody);
+      this.body = this.node.getComponent(f.ComponentRigidbody);
+    
+      setTimeout(()=>{
+        this.zPosition = this.node.mtxWorld.translation.z;
+      },1000);
+      
       f.Loop.addEventListener(f.EVENT.LOOP_FRAME, this.update);
     }
 
@@ -37,12 +43,15 @@ namespace Script {
     public update = (_event: Event) => {
       let moveValue: number = f.Keyboard.mapToTrit([f.KEYBOARD_CODE.ARROW_RIGHT, f.KEYBOARD_CODE.D], [f.KEYBOARD_CODE.ARROW_LEFT, f.KEYBOARD_CODE.A]);
       
-      if(this.agentCanMove) {
-        this.agentControl.setInput(moveValue);
+      if(this.canMove) {
+        this.control.setInput(moveValue);
       }
       
-      this.agentBody.applyForce(f.Vector3.SCALE(f.Vector3.X(), this.agentSpeed * this.agentControl.getOutput()));
-      this.agentBody.setRotation(new f.Vector3(0, -this.agentBody.getVelocity().x,0));
+      this.body.applyForce(f.Vector3.SCALE(f.Vector3.X(), this.speed * this.control.getOutput()));
+      this.body.setRotation(new f.Vector3(0, -this.body.getVelocity().x,0));
+      if(this.zPosition) {
+        this.body.setPosition(new f.Vector3(this.node.mtxWorld.translation.x,this.node.mtxWorld.translation.y, this.zPosition));
+      }
   
     }
 

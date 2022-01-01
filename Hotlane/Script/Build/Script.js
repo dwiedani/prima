@@ -8,36 +8,30 @@ var Script;
             super(name);
             let transformComponent = new f.ComponentTransform;
             this.addComponent(transformComponent);
-            let body = f.MeshObj.LOAD("./assets/car.obj");
+            let carTexture = new f.TextureImage();
+            carTexture.load("../assets/carTexture.png");
+            let coat = new f.CoatTextured(new f.Color(255, 255, 255, 255), carTexture);
+            let body = f.MeshObj.LOAD("./assets/car.obj", "car", new f.Material("Texture", f.ShaderTextureFlat, coat));
             body.mtxLocal.mutate({
                 translation: new f.Vector3(0, -body.mtxLocal.scaling.y / 2, 0)
             });
             this.mtxLocal.mutate({
-                scaling: body.mtxLocal.scaling
+                scaling: f.Vector3.SCALE(body.mtxLocal.scaling, 2)
             });
             this.addChild(body);
-            let carTexture = new f.TextureImage();
-            carTexture.load("../assets/carTexture.png");
-            let coat = new f.CoatTextured(new f.Color(255, 255, 255, 255), carTexture);
-            body.addComponent(new f.ComponentMaterial(new f.Material("Texture", f.ShaderTextureFlat, coat)));
-            this.addChild(body);
-            this.addComponent(new f.ComponentMaterial(new f.Material("mtrAgent", f.ShaderFlat, new f.CoatColored(new f.Color(1, 0, 0, 1)))));
-            this.addComponent(new f.ComponentRigidbody(0.5, f.BODY_TYPE.DYNAMIC, f.COLLIDER_TYPE.CUBE, f.COLLISION_GROUP.DEFAULT, transformComponent.mtxLocal));
+            this.addComponent(new f.ComponentRigidbody(100, f.BODY_TYPE.DYNAMIC, f.COLLIDER_TYPE.CUBE, f.COLLISION_GROUP.DEFAULT, transformComponent.mtxLocal));
             this.addComponent(new Script.AgentComponentScript);
-            //wheels
-            for (let i = 0; i <= 3; i++) {
-                this.wheels.push(f.MeshObj.LOAD("./assets/wheel-" + i + ".obj"));
-            }
             let wheelTexture = new f.TextureImage();
             wheelTexture.load("../assets/wheelTexture.png");
             let wheelCoat = new f.CoatTextured(new f.Color(255, 255, 255, 255), wheelTexture);
-            this.wheels.forEach((wheel) => {
+            //wheels
+            for (let i = 0; i <= 3; i++) {
+                let wheel = f.MeshObj.LOAD("./assets/wheel-" + i + ".obj", "wheel-" + i, new f.Material("Texture", f.ShaderTextureFlat, wheelCoat));
                 wheel.mtxLocal.mutate({
                     translation: new f.Vector3(0, -body.mtxLocal.scaling.y / 2, 0)
                 });
-                wheel.addComponent(new f.ComponentMaterial(new f.Material("Texture", f.ShaderTextureFlat, wheelCoat)));
                 this.addChild(wheel);
-            });
+            }
         }
         getWheels() {
             return this.wheels;
@@ -53,15 +47,16 @@ var Script;
         // Register the script as component for use in the editor via drag&drop
         static iSubclass = f.Component.registerSubclass(AgentComponentScript);
         // Properties may be mutated by users in the editor via the automatically created user interface
-        agentCanMove = true;
-        agentSpeed = 20.0;
-        agentControl;
+        canMove = true;
+        speed = 5000.0;
+        control;
         //private agentTransform: f.Matrix4x4;
-        agentBody;
+        body;
+        zPosition;
         constructor() {
             super();
-            this.agentControl = new f.Control("Movement", 1, 0 /* PROPORTIONAL */);
-            this.agentControl.setDelay(1);
+            this.control = new f.Control("Movement", 1, 0 /* PROPORTIONAL */);
+            this.control.setDelay(1);
             // Don't start when running in editor
             if (f.Project.mode == f.MODE.EDITOR)
                 return;
@@ -71,16 +66,22 @@ var Script;
         }
         create = () => {
             //this.agentTransform = this.node.getComponent(f.ComponentTransform).mtxLocal;
-            this.agentBody = this.node.getComponent(f.ComponentRigidbody);
+            this.body = this.node.getComponent(f.ComponentRigidbody);
+            setTimeout(() => {
+                this.zPosition = this.node.mtxWorld.translation.z;
+            }, 1000);
             f.Loop.addEventListener("loopFrame" /* LOOP_FRAME */, this.update);
         };
         update = (_event) => {
             let moveValue = f.Keyboard.mapToTrit([f.KEYBOARD_CODE.ARROW_RIGHT, f.KEYBOARD_CODE.D], [f.KEYBOARD_CODE.ARROW_LEFT, f.KEYBOARD_CODE.A]);
-            if (this.agentCanMove) {
-                this.agentControl.setInput(moveValue);
+            if (this.canMove) {
+                this.control.setInput(moveValue);
             }
-            this.agentBody.applyForce(f.Vector3.SCALE(f.Vector3.X(), this.agentSpeed * this.agentControl.getOutput()));
-            this.agentBody.setRotation(new f.Vector3(0, -this.agentBody.getVelocity().x, 0));
+            this.body.applyForce(f.Vector3.SCALE(f.Vector3.X(), this.speed * this.control.getOutput()));
+            this.body.setRotation(new f.Vector3(0, -this.body.getVelocity().x, 0));
+            if (this.zPosition) {
+                this.body.setPosition(new f.Vector3(this.node.mtxWorld.translation.x, this.node.mtxWorld.translation.y, this.zPosition));
+            }
         };
         destroy = () => {
             // TODO: add destroy logic here
@@ -271,6 +272,33 @@ var Script;
 var Script;
 (function (Script) {
     var f = FudgeCore;
+    class Obstacle extends f.Node {
+        constructor(name, position, width) {
+            super(name);
+            let cmpTransform = new f.ComponentTransform;
+            this.addComponent(cmpTransform);
+            let cmpMesh = new f.ComponentMesh(new f.MeshCube("ObstacleMesh"));
+            cmpMesh.mtxPivot.mutate({
+                scaling: new f.Vector3(width, 1, 0.25),
+            });
+            cmpMesh.mtxPivot.mutate({
+                translation: new f.Vector3(width / 2, 0, 0),
+            });
+            cmpMesh.mtxPivot.scaling.x / 2;
+            this.addComponent(cmpMesh);
+            this.addComponent(new f.ComponentMaterial(new f.Material("mtrObstacle", f.ShaderFlat, new f.CoatColored(new f.Color(1, 0, 0, 1)))));
+            let body = new f.ComponentRigidbody(100, f.BODY_TYPE.KINEMATIC, f.COLLIDER_TYPE.CUBE, f.COLLISION_GROUP.DEFAULT, cmpTransform.mtxLocal);
+            this.addComponent(body);
+            cmpTransform.mtxLocal.mutate({
+                translation: new f.Vector3(position, cmpMesh.mtxPivot.scaling.y / 2, 0),
+            });
+        }
+    }
+    Script.Obstacle = Obstacle;
+})(Script || (Script = {}));
+var Script;
+(function (Script) {
+    var f = FudgeCore;
     f.Project.registerScriptNamespace(Script); // Register the namespace to FUDGE for serialization
     class RoadComponentScript extends f.ComponentScript {
         // Register the script as component for use in the editor via drag&drop
@@ -279,9 +307,12 @@ var Script;
         message = "RoadComponentScript added to ";
         transform;
         startPosition;
+        roadWidth;
         roadLength;
         speedInc = 50;
-        maxSpeed = 80;
+        maxSpeed = 100;
+        obstacleWidthMin = 2;
+        spawnTrigger = true;
         constructor() {
             super();
             // Don't start when running in editor
@@ -293,6 +324,7 @@ var Script;
             this.addEventListener("nodeDeserialized" /* NODE_DESERIALIZED */, this.hndEvent);
         }
         create = (_event) => {
+            this.roadWidth = this.node.getComponent(f.ComponentMesh).mtxPivot.scaling.x;
             this.roadLength = this.node.getComponent(f.ComponentMesh).mtxPivot.scaling.z;
             this.transform = this.node.getComponent(f.ComponentTransform).mtxLocal;
             this.startPosition = new f.Vector3(this.transform.translation.x, this.transform.translation.y, -this.roadLength);
@@ -303,13 +335,31 @@ var Script;
             let speed = this.speedInc * (f.Loop.timeFrameReal / 1000);
             this.speedInc += this.speedInc <= this.maxSpeed ? 0.01 : 0;
             //let speed = 1;
+            this.reset();
+            this.transform.translateZ(speed);
+        };
+        spawnObstacle() {
+            if (this.spawnTrigger) {
+                this.spawnTrigger = false;
+                let obstacleWidth = (Math.random() * (this.roadWidth / 3 - this.obstacleWidthMin)) + this.obstacleWidthMin;
+                let obstaclePosition = (Math.random() * (this.roadWidth - obstacleWidth));
+                this.node.addChild(new Script.Obstacle("Obstacle", obstaclePosition, obstacleWidth));
+                setTimeout(() => {
+                    this.spawnTrigger = true;
+                }, 1000);
+            }
+        }
+        reset() {
             if (this.transform.translation.z >= this.roadLength) {
                 this.transform.mutate({
                     translation: this.startPosition,
                 });
+                this.node.getChildrenByName("Obstacle").forEach((obstacle) => {
+                    this.node.removeChild(obstacle);
+                });
+                this.spawnObstacle();
             }
-            this.transform.translateZ(speed);
-        };
+        }
         // Activate the functions of this component as response to events
         hndEvent = (_event) => {
             switch (_event.type) {

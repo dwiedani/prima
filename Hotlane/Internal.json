@@ -168,12 +168,12 @@
                 {
                   "ƒ.ComponentRigidbody": {
                     "initialization": "TO_MESH",
-                    "friction": 0.2,
-                    "restitution": 0.2,
-                    "mass": 1,
-                    "dampTranslation": 0.1,
-                    "dampRotation": 0.1,
-                    "effectGravity": 1,
+                    "friction": 0,
+                    "restitution": 0,
+                    "mass": 99999,
+                    "dampTranslation": 0,
+                    "dampRotation": 0,
+                    "effectGravity": 0,
                     "typeBody": "STATIC",
                     "typeCollider": "CUBE",
                     "isTrigger": false,
@@ -328,7 +328,7 @@
                           "startPosition": "undefined",
                           "roadLength": "undefined",
                           "speedInc": 40,
-                          "maxSpeed": 80
+                          "maxSpeed": 120
                         }
                       }
                     ]
@@ -502,7 +502,7 @@
                                 "initialization": "TO_MESH",
                                 "friction": 0.2,
                                 "restitution": 0.2,
-                                "mass": 1,
+                                "mass": 1000,
                                 "dampTranslation": 0.1,
                                 "dampRotation": 0.1,
                                 "effectGravity": 0,
@@ -527,7 +527,7 @@
                     },
                     {
                       "ƒ.Node": {
-                        "name": "GuardrailRIght",
+                        "name": "GuardrailRight",
                         "components": {
                           "ComponentMesh": [
                             {
@@ -582,7 +582,7 @@
                                 "initialization": "TO_MESH",
                                 "friction": 0.2,
                                 "restitution": 0.2,
-                                "mass": 1,
+                                "mass": 1000,
                                 "dampTranslation": 0.1,
                                 "dampRotation": 0.1,
                                 "effectGravity": 1,
@@ -668,7 +668,7 @@
                           "startPosition": "undefined",
                           "roadLength": "undefined",
                           "speedInc": 40,
-                          "maxSpeed": 80
+                          "maxSpeed": 120
                         }
                       }
                     ]
@@ -841,7 +841,7 @@
                                 "initialization": "TO_MESH",
                                 "friction": 0.2,
                                 "restitution": 0.2,
-                                "mass": 1,
+                                "mass": 1000,
                                 "dampTranslation": 0.1,
                                 "dampRotation": 0.1,
                                 "effectGravity": 1,
@@ -866,7 +866,7 @@
                     },
                     {
                       "ƒ.Node": {
-                        "name": "GuardrailRIght",
+                        "name": "GuardrailRight",
                         "components": {
                           "ComponentMesh": [
                             {
@@ -921,7 +921,7 @@
                                 "initialization": "TO_MESH",
                                 "friction": 0.2,
                                 "restitution": 0.2,
-                                "mass": 1,
+                                "mass": 1000,
                                 "dampTranslation": 0.1,
                                 "dampRotation": 0.1,
                                 "effectGravity": 1,
