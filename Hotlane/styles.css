@@ -7,6 +7,24 @@ html, body {
  background-color: black;
 }
 
+.ui {
+  position: absolute;
+  left: 0;
+  top: 0;
+  margin: 1rem;
+  padding: 1rem;
+  border-radius: 15px;
+}
+
+.ui-score {
+  font-size: 27px;
+  font-weight: 700;
+  background-color: transparent;
+  color: #fff;
+  border: 0;
+  font-style: italic;
+}
+
 dialog { 
   text-align: center;
 }

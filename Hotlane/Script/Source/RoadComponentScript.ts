@@ -40,10 +40,9 @@ namespace Script {
     }
 
     public update = (_event: Event): void => {
-      // Roads start to seperate when using frameTime
+      // ISSUE: Roads start to seperate when using frameTime
       let speed: number = this.speedInc * (f.Loop.timeFrameReal / 1000); 
       this.speedInc += this.speedInc <= this.maxSpeed ? 0.01 : 0;
-      //let speed = 1;
 
       this.reset();
       this.transform.translateZ(speed);

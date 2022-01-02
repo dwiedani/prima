@@ -1,9 +1,7 @@
 declare namespace Script {
     import f = FudgeCore;
     class Agent extends f.Node {
-        private wheels;
         constructor(name: string);
-        getWheels(): f.Node[];
     }
 }
 declare namespace Script {
@@ -42,6 +40,18 @@ declare namespace Script {
         message: string;
         constructor();
         hndEvent: (_event: Event) => void;
+    }
+}
+declare namespace Script {
+    import f = FudgeCore;
+    class GameState extends f.Mutable {
+        private static controller;
+        private static instance;
+        score: number;
+        startTime: number;
+        private constructor();
+        static get(): GameState;
+        protected reduceMutator(_mutator: f.Mutator): void;
     }
 }
 declare namespace Script {

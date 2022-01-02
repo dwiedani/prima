@@ -3,7 +3,6 @@ var Script;
 (function (Script) {
     var f = FudgeCore;
     class Agent extends f.Node {
-        wheels = [];
         constructor(name) {
             super(name);
             let transformComponent = new f.ComponentTransform;
@@ -35,9 +34,6 @@ var Script;
                 });
                 this.addChild(wheel);
             }
-        }
-        getWheels() {
-            return this.wheels;
         }
     }
     Script.Agent = Agent;
@@ -195,6 +191,31 @@ var Script;
 var Script;
 (function (Script) {
     var f = FudgeCore;
+    var fui = FudgeUserInterface;
+    class GameState extends f.Mutable {
+        static controller;
+        static instance;
+        score;
+        startTime;
+        constructor() {
+            super();
+            let domHud = document.querySelector("#ui");
+            GameState.instance = this;
+            GameState.controller = new fui.Controller(this, domHud);
+            console.log("Hud-Controller", GameState.controller);
+            this.startTime = Date.now();
+            this.score = 0;
+        }
+        static get() {
+            return GameState.instance || new GameState();
+        }
+        reduceMutator(_mutator) { }
+    }
+    Script.GameState = GameState;
+})(Script || (Script = {}));
+var Script;
+(function (Script) {
+    var f = FudgeCore;
     f.Debug.info("Main Program Template running!");
     let viewport;
     let graph;
@@ -270,6 +291,7 @@ var Script;
         f.Physics.world.simulate(); // if physics is included and used
         viewport.draw();
         f.AudioManager.default.update();
+        Script.GameState.get().score = Math.floor((Date.now() - Script.GameState.get().startTime) / 100);
     }
 })(Script || (Script = {}));
 var Script;
@@ -282,15 +304,15 @@ var Script;
             this.addComponent(cmpTransform);
             let cmpMesh = new f.ComponentMesh(new f.MeshCube("ObstacleMesh"));
             cmpMesh.mtxPivot.mutate({
-                scaling: new f.Vector3(width, 1, 0.25),
-            });
-            cmpMesh.mtxPivot.mutate({
                 translation: new f.Vector3(width / 2, 0, 0),
             });
-            cmpMesh.mtxPivot.scaling.x / 2;
+            cmpMesh.mtxPivot.mutate({
+                scaling: new f.Vector3(width, 1, 0.25),
+            });
             this.addComponent(cmpMesh);
             this.addComponent(new f.ComponentMaterial(new f.Material("mtrObstacle", f.ShaderFlat, new f.CoatColored(new f.Color(1, 0, 0, 1)))));
             let body = new f.ComponentRigidbody(100, f.BODY_TYPE.KINEMATIC, f.COLLIDER_TYPE.CUBE, f.COLLISION_GROUP.DEFAULT, cmpTransform.mtxLocal);
+            body.initialization = f.BODY_INIT.TO_MESH;
             this.addComponent(body);
             cmpTransform.mtxLocal.mutate({
                 translation: new f.Vector3(position, cmpMesh.mtxPivot.scaling.y / 2, 0),
@@ -334,10 +356,9 @@ var Script;
             f.Loop.addEventListener("loopFrame" /* LOOP_FRAME */, this.update);
         };
         update = (_event) => {
-            // Roads start to seperate when using frameTime
+            // ISSUE: Roads start to seperate when using frameTime
             let speed = this.speedInc * (f.Loop.timeFrameReal / 1000);
             this.speedInc += this.speedInc <= this.maxSpeed ? 0.01 : 0;
-            //let speed = 1;
             this.reset();
             this.transform.translateZ(speed);
         };

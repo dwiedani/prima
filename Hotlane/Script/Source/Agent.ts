@@ -2,8 +2,6 @@ namespace Script {
     import f = FudgeCore;
   
     export class Agent extends f.Node {
-    
-      private wheels: f.Node[] = [];
 
       constructor(name: string) {
         super(name);
@@ -16,7 +14,11 @@ namespace Script {
         //let coat: f.CoatTextured = new f.CoatTextured(new f.Color(255,255,255,255), carTexture);
 
         //let body = f.MeshObj.LOAD("./assets/car.obj", "car" ,new f.Material("Texture",f.ShaderTextureFlat,coat));
-        let body = f.MeshObj.LOAD("./assets/car.obj", "car" , new f.Material("mtrCar", f.ShaderFlat, new f.CoatColored(new f.Color(0.5,0,0,1))));
+        let body = f.MeshObj.LOAD(
+          "./assets/car.obj", 
+          "car", 
+          new f.Material("mtrCar", f.ShaderFlat, new f.CoatColored(new f.Color(0.5,0,0,1)))
+        );
         body.mtxLocal.mutate({
           translation: new f.Vector3(0,-body.mtxLocal.scaling.y/2,0)
         });
@@ -33,6 +35,7 @@ namespace Script {
         //wheelTexture.load("../assets/wheelTexture.png");
         //let wheelCoat: f.CoatTextured = new f.CoatTextured(new f.Color(255,255,255,255), wheelTexture);
         let mtrWheel: f.Material = new f.Material("mtrCar", f.ShaderFlat, new f.CoatColored(new f.Color(0.5,0.5,0.5,1)));
+
         //wheels
         for(let i = 0; i <= 3; i++) {
           //let wheel = f.MeshObj.LOAD("./assets/wheel-"+ i +".obj", "wheel-"+i, new f.Material("Texture",f.ShaderTextureFlat,wheelCoat));
@@ -43,10 +46,6 @@ namespace Script {
 
           this.addChild(wheel);
         }
-      }
-
-      public getWheels(): f.Node[] {
-        return this.wheels;
       }
     }
   }
