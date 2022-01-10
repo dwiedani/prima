@@ -51,6 +51,10 @@ declare namespace Script {
         startTime: number;
         private constructor();
         static get(): GameState;
+        gameOver(): void;
+        toggleLoop(): void;
+        startLoop(): void;
+        pauseLoop(): void;
         protected reduceMutator(_mutator: f.Mutator): void;
     }
 }
@@ -59,7 +63,9 @@ declare namespace Script {
 declare namespace Script {
     import f = FudgeCore;
     class Obstacle extends f.Node {
+        private body;
         constructor(name: string, position: number, width: number);
+        handleCollisionEnter(_event: f.EventPhysics): void;
     }
 }
 declare namespace Script {

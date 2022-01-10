@@ -209,6 +209,19 @@ var Script;
         static get() {
             return GameState.instance || new GameState();
         }
+        gameOver() {
+            this.pauseLoop();
+            alert("Game Over: " + this.score);
+        }
+        toggleLoop() {
+            document.hidden ? GameState.get().pauseLoop() : GameState.get().startLoop();
+        }
+        startLoop() {
+            f.Loop.start(f.LOOP_MODE.TIME_REAL, 60); // start the game loop to continously draw the viewport, update the audiosystem and drive the physics i/a
+        }
+        pauseLoop() {
+            f.Loop.stop();
+        }
         reduceMutator(_mutator) { }
     }
     Script.GameState = GameState;
@@ -275,17 +288,8 @@ var Script;
     }
     function start() {
         f.Loop.addEventListener("loopFrame" /* LOOP_FRAME */, update);
-        document.addEventListener("visibilitychange", toggleLoop, false);
-        startLoop();
-    }
-    function toggleLoop() {
-        document.hidden ? pauseLoop() : startLoop();
-    }
-    function startLoop() {
-        f.Loop.start(f.LOOP_MODE.TIME_REAL, 60); // start the game loop to continously draw the viewport, update the audiosystem and drive the physics i/a
-    }
-    function pauseLoop() {
-        f.Loop.stop();
+        document.addEventListener("visibilitychange", Script.GameState.get().toggleLoop, false);
+        Script.GameState.get().startLoop();
     }
     function update(_event) {
         f.Physics.world.simulate(); // if physics is included and used
@@ -298,11 +302,12 @@ var Script;
 (function (Script) {
     var f = FudgeCore;
     class Obstacle extends f.Node {
+        body;
         constructor(name, position, width) {
             super(name);
-            let cmpTransform = new f.ComponentTransform;
+            const cmpTransform = new f.ComponentTransform;
             this.addComponent(cmpTransform);
-            let cmpMesh = new f.ComponentMesh(new f.MeshCube("ObstacleMesh"));
+            const cmpMesh = new f.ComponentMesh(new f.MeshCube("ObstacleMesh"));
             cmpMesh.mtxPivot.mutate({
                 translation: new f.Vector3(width / 2, 0, 0),
             });
@@ -311,12 +316,19 @@ var Script;
             });
             this.addComponent(cmpMesh);
             this.addComponent(new f.ComponentMaterial(new f.Material("mtrObstacle", f.ShaderFlat, new f.CoatColored(new f.Color(1, 0, 0, 1)))));
-            let body = new f.ComponentRigidbody(100, f.BODY_TYPE.KINEMATIC, f.COLLIDER_TYPE.CUBE, f.COLLISION_GROUP.DEFAULT, cmpTransform.mtxLocal);
-            body.initialization = f.BODY_INIT.TO_MESH;
-            this.addComponent(body);
+            this.body = new f.ComponentRigidbody(100, f.BODY_TYPE.KINEMATIC, f.COLLIDER_TYPE.CUBE, f.COLLISION_GROUP.DEFAULT, cmpTransform.mtxLocal);
+            this.body.initialization = f.BODY_INIT.TO_MESH;
+            this.body.addEventListener("ColliderEnteredCollision" /* COLLISION_ENTER */, this.handleCollisionEnter);
+            this.addComponent(this.body);
             cmpTransform.mtxLocal.mutate({
                 translation: new f.Vector3(position, cmpMesh.mtxPivot.scaling.y / 2, 0),
             });
+        }
+        handleCollisionEnter(_event) {
+            console.log(_event);
+            if (_event.cmpRigidbody.node.name === "Agent") {
+                Script.GameState.get().gameOver();
+            }
         }
     }
     Script.Obstacle = Obstacle;

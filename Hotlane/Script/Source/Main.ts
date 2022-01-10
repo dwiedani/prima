@@ -23,7 +23,7 @@ namespace Script {
       });
       //@ts-ignore
       dialog.showModal();
-  }
+    }
 
   async function setupCamera() {
     let _graphId = document.head.querySelector("meta[autoView]").getAttribute("autoView");
@@ -76,20 +76,8 @@ namespace Script {
 
   function start(): void {
     f.Loop.addEventListener(f.EVENT.LOOP_FRAME, update);
-    document.addEventListener("visibilitychange", toggleLoop, false );
-    startLoop();
-  }
-
-  function toggleLoop(): void {
-    document.hidden ? pauseLoop() : startLoop();
-  }
-
-  function startLoop(): void {
-    f.Loop.start(f.LOOP_MODE.TIME_REAL, 60);  // start the game loop to continously draw the viewport, update the audiosystem and drive the physics i/a
-  }
-
-  function pauseLoop(): void  {
-    f.Loop.stop();
+    document.addEventListener("visibilitychange", GameState.get().toggleLoop, false );
+    GameState.get().startLoop();
   }
  
   function update(_event: Event): void {
