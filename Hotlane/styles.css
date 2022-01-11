@@ -25,6 +25,17 @@ html, body {
   font-style: italic;
 }
 
+#ui-scoreboard.scoreboard {
+  position: absolute;
+  right: 0;
+  top: 0;
+  margin: 1rem;
+  border-radius: 15px;
+  background-color: white;
+  text-align: left;
+  padding: 0.5rem 1rem;
+}
+
 dialog { 
   text-align: center;
 }

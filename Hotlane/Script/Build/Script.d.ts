@@ -89,3 +89,17 @@ declare namespace Script {
         hndEvent: (_event: Event) => void;
     }
 }
+declare namespace Script {
+    import f = FudgeCore;
+    class Scoreboard extends f.Mutable {
+        private static instance;
+        private scoreboard;
+        private domHud;
+        private constructor();
+        static get(): Scoreboard;
+        generateUi(): void;
+        loadScoreboard(): Promise<any>;
+        postScore(name: string, score: number): Promise<any>;
+        protected reduceMutator(_mutator: f.Mutator): void;
+    }
+}

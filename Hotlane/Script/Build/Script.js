@@ -211,7 +211,12 @@ var Script;
         }
         gameOver() {
             this.pauseLoop();
-            alert("Game Over: " + this.score);
+            let name = prompt("Game Over: " + this.score + ", Please enter your name", "anonymous");
+            if (name !== null || name !== "") {
+                Script.Scoreboard.get().postScore(name, this.score).then((newScoreboard) => {
+                    console.log(newScoreboard);
+                });
+            }
         }
         toggleLoop() {
             document.hidden ? GameState.get().pauseLoop() : GameState.get().startLoop();
@@ -249,6 +254,7 @@ var Script;
         });
         //@ts-ignore
         dialog.showModal();
+        Script.Scoreboard.get().loadScoreboard();
     }
     async function setupCamera() {
         let _graphId = document.head.querySelector("meta[autoView]").getAttribute("autoView");
@@ -290,6 +296,9 @@ var Script;
         f.Loop.addEventListener("loopFrame" /* LOOP_FRAME */, update);
         document.addEventListener("visibilitychange", Script.GameState.get().toggleLoop, false);
         Script.GameState.get().startLoop();
+        Script.Scoreboard.get().loadScoreboard().then((data) => {
+            console.log(data);
+        });
     }
     function update(_event) {
         f.Physics.world.simulate(); // if physics is included and used
@@ -415,5 +424,61 @@ var Script;
         };
     }
     Script.RoadComponentScript = RoadComponentScript;
+})(Script || (Script = {}));
+var Script;
+(function (Script) {
+    var f = FudgeCore;
+    class Scoreboard extends f.Mutable {
+        static instance;
+        scoreboard;
+        domHud;
+        constructor() {
+            super();
+            Scoreboard.instance = this;
+            this.domHud = document.querySelector("#ui-scoreboard__inner");
+        }
+        static get() {
+            return Scoreboard.instance || new Scoreboard();
+        }
+        generateUi() {
+            const ol = document.createElement('ol');
+            this.scoreboard.forEach((item) => {
+                const li = document.createElement('li');
+                ol.appendChild(li);
+                li.innerHTML += item.name + ": " + item.score;
+            });
+            this.domHud.innerHTML = '';
+            this.domHud.append(ol);
+        }
+        async loadScoreboard() {
+            return new Promise(resolve => {
+                fetch('https://hotlane-scoreboard.herokuapp.com/score', {
+                    method: 'GET'
+                }).then(response => response.json())
+                    .then((data) => {
+                    this.scoreboard = data.scoreboard;
+                    this.generateUi();
+                    resolve(this.scoreboard);
+                });
+            });
+        }
+        async postScore(name, score) {
+            return new Promise(resolve => {
+                fetch('https://hotlane-scoreboard.herokuapp.com/score', {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        "name": name,
+                        "score": score
+                    })
+                }).then(response => response.json())
+                    .then((data) => {
+                    this.scoreboard = data.scoreboard;
+                    resolve(this.scoreboard);
+                });
+            });
+        }
+        reduceMutator(_mutator) { }
+    }
+    Script.Scoreboard = Scoreboard;
 })(Script || (Script = {}));
 //# sourceMappingURL=Script.js.map

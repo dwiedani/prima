@@ -23,6 +23,7 @@ namespace Script {
       });
       //@ts-ignore
       dialog.showModal();
+      Scoreboard.get().loadScoreboard();
     }
 
   async function setupCamera() {
@@ -78,6 +79,9 @@ namespace Script {
     f.Loop.addEventListener(f.EVENT.LOOP_FRAME, update);
     document.addEventListener("visibilitychange", GameState.get().toggleLoop, false );
     GameState.get().startLoop();
+    Scoreboard.get().loadScoreboard().then((data)=>{
+      console.log(data);
+    });
   }
  
   function update(_event: Event): void {

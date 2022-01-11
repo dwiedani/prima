@@ -7,7 +7,7 @@ namespace Script {
       private static instance: GameState;
       public score: number;
       public startTime: number;
-
+      
       private constructor() {
         super();
         let domHud: HTMLDivElement = document.querySelector("#ui");
@@ -24,7 +24,12 @@ namespace Script {
 
       public gameOver() {
         this.pauseLoop();
-        alert("Game Over: " + this.score);
+        let name = prompt("Game Over: " + this.score +", Please enter your name", "anonymous");
+        if (name !== null || name !== "") {
+          Scoreboard.get().postScore(name,this.score).then((newScoreboard)=>{
+            console.log(newScoreboard);
+          });
+        }
       }
 
       public toggleLoop(): void {
