@@ -43,7 +43,6 @@ namespace Script {
       // ISSUE: Roads start to seperate when using frameTime
       let speed: number = this.speedInc * (f.Loop.timeFrameReal / 1000); 
       this.speedInc += this.speedInc <= this.maxSpeed ? 0.01 : 0;
-
       this.reset();
       this.transform.translateZ(speed);
     }
@@ -69,6 +68,8 @@ namespace Script {
         this.node.getChildrenByName("Obstacle").forEach((obstacle)=>{
           this.node.removeChild(obstacle);
         });
+
+        GameState.get().score += 1;
 
         this.spawnObstacle();
       } 

@@ -30,7 +30,7 @@ var Script;
                 //let wheel = f.MeshObj.LOAD("./assets/wheel-"+ i +".obj", "wheel-"+i, new f.Material("Texture",f.ShaderTextureFlat,wheelCoat));
                 let wheel = f.MeshObj.LOAD("./assets/wheel-" + i + ".obj", "wheel-" + i, mtrWheel);
                 wheel.mtxLocal.mutate({
-                    translation: new f.Vector3(0, -body.mtxLocal.scaling.y / 2, 0)
+                    translation: new f.Vector3(0, -body.mtxLocal.scaling.y / 2.1, 0)
                 });
                 this.addChild(wheel);
             }
@@ -295,7 +295,7 @@ var Script;
         f.Physics.world.simulate(); // if physics is included and used
         viewport.draw();
         f.AudioManager.default.update();
-        Script.GameState.get().score = Math.floor((Date.now() - Script.GameState.get().startTime) / 100);
+        //GameState.get().score = Math.floor((Date.now() - GameState.get().startTime) / 100);
     }
 })(Script || (Script = {}));
 var Script;
@@ -393,6 +393,7 @@ var Script;
                 this.node.getChildrenByName("Obstacle").forEach((obstacle) => {
                     this.node.removeChild(obstacle);
                 });
+                Script.GameState.get().score += 1;
                 this.spawnObstacle();
             }
         }

@@ -41,7 +41,7 @@ namespace Script {
           //let wheel = f.MeshObj.LOAD("./assets/wheel-"+ i +".obj", "wheel-"+i, new f.Material("Texture",f.ShaderTextureFlat,wheelCoat));
           let wheel = f.MeshObj.LOAD("./assets/wheel-"+ i +".obj", "wheel-"+i, mtrWheel);
           wheel.mtxLocal.mutate({
-            translation: new f.Vector3(0,-body.mtxLocal.scaling.y/2,0)
+            translation: new f.Vector3(0,-body.mtxLocal.scaling.y/2.1,0)
           });
 
           this.addChild(wheel);
