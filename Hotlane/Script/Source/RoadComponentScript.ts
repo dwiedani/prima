@@ -36,6 +36,7 @@ namespace Script {
       this.roadLength = this.node.getComponent(f.ComponentMesh).mtxPivot.scaling.z;
       this.transform = this.node.getComponent(f.ComponentTransform).mtxLocal;
       this.startPosition = new f.Vector3(this.transform.translation.x,this.transform.translation.y,-this.roadLength);
+      this.maxSpeed = 150;
       f.Loop.addEventListener(f.EVENT.LOOP_FRAME, this.update);
     }
 

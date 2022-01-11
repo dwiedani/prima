@@ -51,6 +51,7 @@ namespace Script {
             }).then(response => response.json())
               .then((data) => {            
                 this.scoreboard = data.scoreboard;
+                this.generateUi();
                 resolve(this.scoreboard);
               });
           })

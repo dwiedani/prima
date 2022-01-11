@@ -324,7 +324,7 @@ var Script;
                 scaling: new f.Vector3(width, 1, 0.25),
             });
             this.addComponent(cmpMesh);
-            this.addComponent(new f.ComponentMaterial(new f.Material("mtrObstacle", f.ShaderFlat, new f.CoatColored(new f.Color(1, 0, 0, 1)))));
+            this.addComponent(new f.ComponentMaterial(new f.Material("mtrObstacle", f.ShaderFlat, new f.CoatColored(new f.Color(0.5, 1, 0, 1)))));
             this.body = new f.ComponentRigidbody(100, f.BODY_TYPE.KINEMATIC, f.COLLIDER_TYPE.CUBE, f.COLLISION_GROUP.DEFAULT, cmpTransform.mtxLocal);
             this.body.initialization = f.BODY_INIT.TO_MESH;
             this.body.addEventListener("ColliderEnteredCollision" /* COLLISION_ENTER */, this.handleCollisionEnter);
@@ -374,6 +374,7 @@ var Script;
             this.roadLength = this.node.getComponent(f.ComponentMesh).mtxPivot.scaling.z;
             this.transform = this.node.getComponent(f.ComponentTransform).mtxLocal;
             this.startPosition = new f.Vector3(this.transform.translation.x, this.transform.translation.y, -this.roadLength);
+            this.maxSpeed = 150;
             f.Loop.addEventListener("loopFrame" /* LOOP_FRAME */, this.update);
         };
         update = (_event) => {
@@ -473,6 +474,7 @@ var Script;
                 }).then(response => response.json())
                     .then((data) => {
                     this.scoreboard = data.scoreboard;
+                    this.generateUi();
                     resolve(this.scoreboard);
                 });
             });
