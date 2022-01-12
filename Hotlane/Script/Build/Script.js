@@ -429,6 +429,7 @@ var Script;
 var Script;
 (function (Script) {
     var f = FudgeCore;
+    require("dotenv").config();
     class Scoreboard extends f.Mutable {
         static instance;
         scoreboard;

@@ -1,5 +1,6 @@
 namespace Script {
     import f = FudgeCore;
+    require("dotenv").config();
 
     export class Scoreboard extends f.Mutable {
         private static instance: Scoreboard;
