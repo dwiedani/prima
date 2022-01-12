@@ -1,21 +1,24 @@
 name: Deploy to GitHub Pages
-    on:
-      push:
-        branches:
-          - main
-    jobs:
-      build-and-deploy:
-        runs-on: ubuntu-latest
-        steps:
-        - name: Checkout
-          uses: actions/checkout@v1
-
-        - name: Build
-          env:
-            HOTLANE_SERVICE_TOKEN: ${{ secrets.HOTLANE_SERVICE_TOKEN }}
-
-        - name: Deploy
-          uses: JamesIves/github-pages-deploy-action@4.0.0
-          with:
-            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN_KEY }}
-            BRANCH: main
+on:
+  push:
+    branches:
+      - master
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v1
+    - name: Build
+      run: |
+        npm install
+        npm run-script build
+      env:
+        REACT_APP_INSTAGRAM_ACCESS_TOKEN: ${{ secrets.REACT_APP_INSTAGRAM_ACCESS_TOKEN }}
+        REACT_APP_SMTP_SECURE_TOKEN: ${{ secrets.REACT_APP_SMTP_SECURE_TOKEN }}
+    - name: Deploy
+      uses: JamesIves/github-pages-deploy-action@releases/v3
+      with:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN_KEY }}
+        BRANCH: gh-pages
+        FOLDER: dist
