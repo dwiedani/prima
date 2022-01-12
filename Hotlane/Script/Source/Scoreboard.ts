@@ -10,6 +10,7 @@ namespace Script {
             super();
             Scoreboard.instance = this;
             this.domHud = document.querySelector("#ui-scoreboard__inner");
+            console.log("token", process.env.HOTLANE_SERVICE_TOKEN);
         }
 
         public static get(): Scoreboard {

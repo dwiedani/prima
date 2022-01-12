@@ -437,6 +437,7 @@ var Script;
             super();
             Scoreboard.instance = this;
             this.domHud = document.querySelector("#ui-scoreboard__inner");
+            console.log("token", process.env.HOTLANE_SERVICE_TOKEN);
         }
         static get() {
             return Scoreboard.instance || new Scoreboard();
@@ -465,7 +466,7 @@ var Script;
         }
         async postScore(name, score) {
             return new Promise(resolve => {
-                fetch('https://hotlane-scoreboard.herokuapp.com/score', {
+                fetch('https://hotlane-scoreboard.herokuapp.com/score?TOKEN=' + process.env.HOTLANE_SERVICE_TOKEN, {
                     method: 'POST',
                     body: JSON.stringify({
                         "name": name,
