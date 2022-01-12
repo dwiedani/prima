@@ -42,7 +42,7 @@ namespace Script {
     
         public async postScore(name: string, score: number): Promise<any> {
           return new Promise(resolve => {
-            fetch('https://hotlane-scoreboard.herokuapp.com/score?TOKEN=3t3tg34ff34fwsdfagh',{
+            fetch('https://hotlane-scoreboard.herokuapp.com/score?TOKEN=' + process.env.HOTLANE_SERVICE_TOKEN,{
               method: 'POST',
               body: JSON.stringify({
                 "name": name,
