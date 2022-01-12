@@ -10,6 +10,7 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v1
     - name: Build
+      run:
       env:
         HOTLANE_SERVICE_TOKEN: ${{ secrets.HOTLANE_SERVICE_TOKEN }}
     - name: Deploy
